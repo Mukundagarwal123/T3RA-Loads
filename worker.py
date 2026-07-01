@@ -4,13 +4,36 @@ import socket
 import time
 from typing import Any, Dict
 
-from db import upsert_shipment
+from carrier_processor import build_carrier_record
+from db import carrier_exists, upsert_carriers, upsert_shipment
+from extractors import extract_carrier_id
 from shipment_processor import build_record
-from turvo_client import fetch_shipment_details
+from turvo_client import fetch_carrier_details, fetch_shipment_details
 from webhook_queue import claim_events, ensure_schema, mark_done, mark_retry_or_dead
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 logger = logging.getLogger("worker")
+
+
+def sync_carrier(carrier_id: int) -> None:
+    """Add the carrier to our carriers table if we haven't seen it before."""
+    try:
+        if carrier_exists(carrier_id):
+            logger.info("Carrier already on file | carrier_id=%s", carrier_id)
+            return
+
+        logger.info("New carrier detected, fetching from Turvo | carrier_id=%s", carrier_id)
+        carrier_resp = fetch_carrier_details(carrier_id)
+        carrier_details = carrier_resp.get("details") or carrier_resp
+        carrier_record = build_carrier_record(carrier_details)
+        upsert_carriers([carrier_record])
+        logger.info(
+            "Carrier added | carrier_id=%s name=%s", carrier_id, carrier_record.get("name"),
+        )
+    except Exception:
+        # Carrier sync is a side effect of shipment processing; a failure here
+        # shouldn't fail/retry the whole shipment event.
+        logger.exception("Carrier sync FAILED | carrier_id=%s", carrier_id)
 
 
 def process_one(event: Dict[str, Any], max_attempts: int) -> None:
@@ -32,6 +55,13 @@ def process_one(event: Dict[str, Any], max_attempts: int) -> None:
         logger.info("Record built | shipment_id=%s record=%s", shipment_id, record)
 
         upsert_shipment(record)
+
+        details = shipment.get("details") or shipment
+        carrier_id = extract_carrier_id(details)
+        if carrier_id is not None:
+            sync_carrier(carrier_id)
+        else:
+            logger.warning("No carrier id found on shipment | shipment_id=%s", shipment_id)
 
         mark_done(event_id)
         logger.info(

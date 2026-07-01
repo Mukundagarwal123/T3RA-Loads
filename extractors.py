@@ -100,6 +100,20 @@ def extract_carrier_name(details: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def extract_carrier_id(details: Dict[str, Any]) -> Optional[int]:
+    carrier_orders = details.get("carrierOrder") or []
+    for co in carrier_orders:
+        if co.get("deleted") is False:
+            carrier = co.get("carrier") or {}
+            if carrier.get("id") and carrier.get("name") != LUMPER_CARRIER_NAME:
+                return carrier.get("id")
+    if carrier_orders:
+        carrier_id = (carrier_orders[0].get("carrier") or {}).get("id")
+        if carrier_id:
+            return carrier_id
+    return None
+
+
 def _sum_line_items(line_items: List[dict], code_match: str) -> float:
     total = 0.0
     for li in line_items:

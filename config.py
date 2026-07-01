@@ -18,6 +18,7 @@ DB_NAME = _req("DB_NAME")
 DB_USER = _req("DB_USER")
 DB_PASSWORD = _req("DB_PASSWORD")
 TABLE_NAME = os.getenv("TABLE_NAME", "route_complete_shipments")
+CARRIER_TABLE_NAME = os.getenv("CARRIER_TABLE_NAME", "carriers")
 
 TURVO_BASE_URL = _req("TURVO_BASE_URL")
 TURVO_CLIENT_ID = _req("TURVO_CLIENT_ID")

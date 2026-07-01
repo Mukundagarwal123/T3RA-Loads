@@ -52,3 +52,16 @@ def fetch_shipment_details(shipment_id: int) -> Dict[str, Any]:
     resp = requests.get(url, headers=headers, timeout=30)
     resp.raise_for_status()
     return resp.json()
+
+
+def fetch_carrier_details(carrier_id: int) -> Dict[str, Any]:
+    token = get_access_token()
+    url = f"{config.TURVO_BASE_URL}/v1/carriers/{carrier_id}"
+    headers = {
+        "x-api-key": config.TURVO_API_KEY,
+        "Authorization": f"Bearer {token}",
+        "Content-Type": "application/json",
+    }
+    resp = requests.get(url, headers=headers, timeout=30)
+    resp.raise_for_status()
+    return resp.json()
