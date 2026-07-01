@@ -32,3 +32,6 @@ WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhooks/turvo")
 
 # Only these statuses trigger processing (case-insensitive).
 TRIGGER_STATUSES = {"route complete", "completed"}
+
+# Monitoring (optional - only needed by healthcheck.py)
+TEAMS_WEBHOOK_URL = os.getenv("TEAMS_WEBHOOK_URL", "")
