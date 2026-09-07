@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from typing import Any, Dict, List, Optional, Tuple
 
 LUMPER_CARRIER_NAME = "Lumper Advance"
@@ -24,14 +24,26 @@ def _parse_timestamp(li: dict) -> datetime:
         return datetime.min.replace(tzinfo=timezone.utc)
 
 
-def format_mmddyyyy(iso_ts: Optional[str]) -> Optional[str]:
+def parse_date(iso_ts: Optional[str]) -> Optional[date]:
+    """A Turvo timestamp as a real date, for the DATE columns.
+
+    The MM/DD/YYYY text columns are kept for anything already reading them, but
+    they sort alphabetically - 01/03/2023 lands before 12/30/2022 - so no query
+    can ask "in the last 90 days" or order loads in time. Recency is the whole
+    basis of the market scoring, hence a proper date alongside.
+    """
     if not iso_ts:
         return None
     try:
-        dt = datetime.fromisoformat(iso_ts.replace("Z", "+00:00"))
-        return dt.strftime("%m/%d/%Y")
+        return datetime.fromisoformat(iso_ts.replace("Z", "+00:00")).date()
     except Exception:
         return None
+
+
+def format_mmddyyyy(iso_ts: Optional[str]) -> Optional[str]:
+    """The legacy text form. Derived from parse_date so the two cannot disagree."""
+    parsed = parse_date(iso_ts)
+    return parsed.strftime("%m/%d/%Y") if parsed else None
 
 
 def extract_equipment(details: Dict[str, Any]) -> Optional[str]:

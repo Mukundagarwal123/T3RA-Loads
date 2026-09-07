@@ -12,6 +12,7 @@ from extractors import (
     extract_totals,
     format_mmddyyyy,
     normalize_equipment,
+    parse_date,
 )
 
 logger = logging.getLogger(__name__)
@@ -51,6 +52,10 @@ def build_record(shipment: Dict[str, Any]) -> Dict[str, Any]:
         "total_stops": len(stops),
         "pickup_date": format_mmddyyyy(start_date_obj.get("date")),
         "delivery_date": format_mmddyyyy(end_date_obj.get("date")),
+        # Real dates alongside the text ones: MM/DD/YYYY strings sort
+        # alphabetically, so nothing can ask how recent a load is.
+        "pickup_on": parse_date(start_date_obj.get("date")),
+        "delivery_on": parse_date(end_date_obj.get("date")),
         "customer_name": extract_customer_name(details),
         "carrier_name": extract_carrier_name(details),
         # Stored as well as used, so loads can be joined to carriers by id.
