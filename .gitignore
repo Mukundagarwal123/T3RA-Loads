@@ -7,3 +7,8 @@ __pycache__/
 .turvo_token.json
 .turvo_token.json.lock
 .watchdog_state.json
+
+# packaging
+*.egg-info/
+build/
+dist/

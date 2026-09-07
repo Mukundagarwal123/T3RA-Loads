@@ -7,12 +7,12 @@ echo "Pulling latest from main..."
 git pull origin main
 
 echo "Installing dependencies..."
-.venv/bin/pip install -r requirements.txt -q
+.venv/bin/pip install -e . -q
 
 # Before the restart, never after: the new code writes columns the old schema
 # may not have, and set -e aborts here rather than restarting into failure.
 echo "Applying migrations..."
-.venv/bin/python migrate.py
+.venv/bin/python scripts/migrate.py
 
 echo "Restarting services..."
 sudo systemctl restart t3ra-webhook t3ra-worker

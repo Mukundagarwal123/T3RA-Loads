@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional
 
 from psycopg2.extras import Json, RealDictCursor
 
-from db import get_conn
+from turvo_db.db import get_conn
 
 logger = logging.getLogger(__name__)
 

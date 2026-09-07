@@ -9,7 +9,7 @@ number of times, and safe to run against a database that is already up to date.
 import logging
 import sys
 
-import db
+from turvo_db import db
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

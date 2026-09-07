@@ -4,8 +4,8 @@ from typing import Any, Dict, Optional
 import uvicorn
 from fastapi import FastAPI, HTTPException, Request
 
-import config
-from webhook_queue import enqueue_event
+from turvo_db import config
+from turvo_db.webhook_queue import enqueue_event
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 logger = logging.getLogger(__name__)

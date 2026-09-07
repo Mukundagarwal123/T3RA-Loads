@@ -6,7 +6,7 @@ from pathlib import Path
 
 import psycopg2
 
-import config
+from turvo_db import config
 
 STATE_FILE = Path(__file__).parent / ".watchdog_state.json"
 SERVICES = ["t3ra-webhook", "t3ra-worker"]

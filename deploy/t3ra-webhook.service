@@ -1,0 +1,16 @@
+# Install: sudo cp deploy/t3ra-webhook.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl restart t3ra-webhook
+[Unit]
+Description=T3RA Turvo webhook receiver
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/turvo-db
+ExecStart=/home/ubuntu/turvo-db/.venv/bin/python -m turvo_db.webhook_server
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

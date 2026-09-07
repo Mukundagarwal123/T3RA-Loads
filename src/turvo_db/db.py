@@ -4,13 +4,42 @@ from contextlib import contextmanager
 import psycopg2
 from psycopg2.extras import execute_values
 
-import config
+from turvo_db import config
 
 logger = logging.getLogger(__name__)
 
 _SCHEMA_READY = False
 _CARRIER_SCHEMA_READY = False
 _MIGRATIONS_READY = False
+
+
+def _convert_text_date_column(table: str, column: str) -> str:
+    """DDL converting a MM/DD/YYYY text column to a real DATE, only if needed.
+
+    Wrapped in a DO block that checks the current type first: ALTER ... TYPE
+    with a regex in its USING clause fails outright once the column is already a
+    date, which would make every later migration run abort.
+    """
+    return rf"""
+    DO $$
+    BEGIN
+        IF EXISTS (
+            SELECT 1 FROM information_schema.columns
+            WHERE table_name = '{table}' AND column_name = '{column}'
+              AND data_type = 'text'
+        ) THEN
+            ALTER TABLE {table}
+            ALTER COLUMN {column} TYPE DATE
+            USING CASE
+                WHEN {column} ~ '^[0-9]{{2}}/[0-9]{{2}}/[0-9]{{4}}$'
+                    THEN to_date({column}, 'MM/DD/YYYY')
+                WHEN {column} ~ '^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}$'
+                    THEN {column}::date
+            END;
+        END IF;
+    END $$;
+    """
+
 
 # Statements applied by apply_migrations(). Every one is idempotent, so there is
 # no version table and no ordering state to keep - re-running is always safe.
@@ -59,12 +88,19 @@ MIGRATIONS = [
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS kma_mapped_at TIMESTAMPTZ;",
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id BIGINT;",
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id_source TEXT;",
-    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS pickup_on DATE;",
-    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS delivery_on DATE;",
+    # pickup_date/delivery_date were TEXT holding MM/DD/YYYY, which Postgres
+    # compares as strings - month first, year last - so they could not be
+    # sorted or filtered by time. Converted in place rather than replaced by new
+    # columns, because other code reads these names. Guarded on the current type
+    # so re-running is a no-op.
+    _convert_text_date_column(config.TABLE_NAME, "pickup_date"),
+    _convert_text_date_column(config.TABLE_NAME, "delivery_date"),
+    f"ALTER TABLE {config.TABLE_NAME} DROP COLUMN IF EXISTS pickup_on;",
+    f"ALTER TABLE {config.TABLE_NAME} DROP COLUMN IF EXISTS delivery_on;",
     f"CREATE INDEX IF NOT EXISTS idx_rcs_lane_kma ON {config.TABLE_NAME} (origin_kma, destination_kma);",
     f"CREATE INDEX IF NOT EXISTS idx_rcs_carrier_id ON {config.TABLE_NAME} (carrier_id);",
     f"CREATE INDEX IF NOT EXISTS idx_rcs_kma_todo ON {config.TABLE_NAME} (id) WHERE kma_mapped_at IS NULL;",
-    f"CREATE INDEX IF NOT EXISTS idx_rcs_pickup_on ON {config.TABLE_NAME} (pickup_on);",
+    f"CREATE INDEX IF NOT EXISTS idx_rcs_pickup_date ON {config.TABLE_NAME} (pickup_date);",
 ]
 
 
@@ -122,10 +158,8 @@ def ensure_schema() -> None:
         destination_state TEXT,
         destination_zip TEXT,
         total_stops INTEGER,
-        pickup_date TEXT,
-        delivery_date TEXT,
-        pickup_on DATE,
-        delivery_on DATE,
+        pickup_date DATE,
+        delivery_date DATE,
         customer_name TEXT,
         carrier_name TEXT,
         customer_freight_cost NUMERIC,
@@ -161,7 +195,6 @@ def upsert_shipment(record: dict) -> None:
         origin_city, origin_state, origin_zip,
         destination_city, destination_state, destination_zip,
         total_stops, pickup_date, delivery_date,
-        pickup_on, delivery_on,
         customer_name, carrier_name,
         customer_freight_cost, carrier_freight_cost,
         customer_total_cost, carrier_total_cost,
@@ -174,7 +207,6 @@ def upsert_shipment(record: dict) -> None:
         %(origin_city)s, %(origin_state)s, %(origin_zip)s,
         %(destination_city)s, %(destination_state)s, %(destination_zip)s,
         %(total_stops)s, %(pickup_date)s, %(delivery_date)s,
-        %(pickup_on)s, %(delivery_on)s,
         %(customer_name)s, %(carrier_name)s,
         %(customer_freight_cost)s, %(carrier_freight_cost)s,
         %(customer_total_cost)s, %(carrier_total_cost)s,
@@ -194,8 +226,6 @@ def upsert_shipment(record: dict) -> None:
         total_stops = EXCLUDED.total_stops,
         pickup_date = EXCLUDED.pickup_date,
         delivery_date = EXCLUDED.delivery_date,
-        pickup_on = EXCLUDED.pickup_on,
-        delivery_on = EXCLUDED.delivery_on,
         customer_name = EXCLUDED.customer_name,
         carrier_name = EXCLUDED.carrier_name,
         customer_freight_cost = EXCLUDED.customer_freight_cost,

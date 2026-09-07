@@ -28,8 +28,7 @@ import argparse
 import logging
 import sys
 
-import config
-import db
+from turvo_db import config, db
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

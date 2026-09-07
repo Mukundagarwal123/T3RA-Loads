@@ -4,13 +4,13 @@ import socket
 import time
 from typing import Any, Dict
 
-import config
-import kma
-from carrier_processor import build_carrier_record
-from db import carrier_exists, upsert_carriers, upsert_shipment
-from shipment_processor import build_record
-from turvo_client import TurvoAuthError, fetch_carrier_details, fetch_shipment_details
-from webhook_queue import (
+from turvo_db import config
+from turvo_db import kma
+from turvo_db.carrier_processor import build_carrier_record
+from turvo_db.db import carrier_exists, upsert_carriers, upsert_shipment
+from turvo_db.shipment_processor import build_record
+from turvo_db.turvo_client import TurvoAuthError, fetch_carrier_details, fetch_shipment_details
+from turvo_db.webhook_queue import (
     claim_events,
     defer_for_auth,
     ensure_schema,

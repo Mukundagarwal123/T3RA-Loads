@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "turvo-db"
+version = "1.0.0"
+description = "Ingests Turvo route-complete shipments into Postgres and maps them to DAT market areas"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi==0.115.8",
+    "uvicorn[standard]==0.30.6",
+    "requests==2.32.3",
+    "python-dotenv==1.0.1",
+    "psycopg2-binary==2.9.11",
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]

@@ -27,10 +27,10 @@ import sys
 import time
 from collections import Counter
 
-import db
-from extractors import extract_carrier_id, extract_carrier_name
-from turvo_client import TurvoAuthError, fetch_shipment_details
-from worker import sync_carrier
+from turvo_db import db
+from turvo_db.extractors import extract_carrier_id, extract_carrier_name
+from turvo_db.turvo_client import TurvoAuthError, fetch_shipment_details
+from turvo_db.worker import sync_carrier
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

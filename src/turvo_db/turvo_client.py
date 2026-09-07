@@ -8,7 +8,7 @@ from typing import Any, Dict, Optional
 
 import requests
 
-import config
+from turvo_db import config
 
 logger = logging.getLogger(__name__)
 

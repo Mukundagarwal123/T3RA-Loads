@@ -3,7 +3,7 @@ import csv
 import logging
 import re
 
-import db
+from turvo_db import db
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

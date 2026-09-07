@@ -14,7 +14,7 @@ import re
 from datetime import datetime, timezone
 from typing import Dict, Optional, Tuple
 
-import db
+from turvo_db import db
 
 logger = logging.getLogger(__name__)
 

@@ -16,8 +16,8 @@ import logging
 import sys
 from collections import Counter
 
-import db
-import kma
+from turvo_db import db
+from turvo_db import kma
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)

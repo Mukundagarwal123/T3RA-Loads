@@ -25,12 +25,14 @@ def _parse_timestamp(li: dict) -> datetime:
 
 
 def parse_date(iso_ts: Optional[str]) -> Optional[date]:
-    """A Turvo timestamp as a real date, for the DATE columns.
+    """A Turvo timestamp as a real date.
 
-    The MM/DD/YYYY text columns are kept for anything already reading them, but
-    they sort alphabetically - 01/03/2023 lands before 12/30/2022 - so no query
-    can ask "in the last 90 days" or order loads in time. Recency is the whole
-    basis of the market scoring, hence a proper date alongside.
+    These used to be stored as MM/DD/YYYY text, which Postgres compares as
+    strings: the month is weighed first and the year last, so 01/03/2023 sorted
+    before 12/30/2022 and min()/max() returned the first and last strings rather
+    than the first and last loads. Recency is the whole basis of the market
+    scoring, so the dates are converted here, once, at the point the shipment
+    arrives.
     """
     if not iso_ts:
         return None
@@ -38,12 +40,6 @@ def parse_date(iso_ts: Optional[str]) -> Optional[date]:
         return datetime.fromisoformat(iso_ts.replace("Z", "+00:00")).date()
     except Exception:
         return None
-
-
-def format_mmddyyyy(iso_ts: Optional[str]) -> Optional[str]:
-    """The legacy text form. Derived from parse_date so the two cannot disagree."""
-    parsed = parse_date(iso_ts)
-    return parsed.strftime("%m/%d/%Y") if parsed else None
 
 
 def extract_equipment(details: Dict[str, Any]) -> Optional[str]:
