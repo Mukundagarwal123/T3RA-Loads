@@ -4,6 +4,7 @@ from typing import Any, Dict
 from extractors import (
     compute_carrier_freight_cost,
     compute_customer_freight_cost,
+    extract_carrier_id,
     extract_carrier_name,
     extract_customer_name,
     extract_equipment,
@@ -52,6 +53,10 @@ def build_record(shipment: Dict[str, Any]) -> Dict[str, Any]:
         "delivery_date": format_mmddyyyy(end_date_obj.get("date")),
         "customer_name": extract_customer_name(details),
         "carrier_name": extract_carrier_name(details),
+        # Stored as well as used, so loads can be joined to carriers by id.
+        # Matching on carrier_name alone breaks on "ABC Trucking LLC" versus
+        # "ABC Trucking, LLC", and every per-carrier report depends on the join.
+        "carrier_id": extract_carrier_id(details),
         "customer_freight_cost": compute_customer_freight_cost(details),
         "carrier_freight_cost": compute_carrier_freight_cost(details),
         "customer_total_cost": customer_total_cost,

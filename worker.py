@@ -5,9 +5,9 @@ import time
 from typing import Any, Dict
 
 import config
+import kma
 from carrier_processor import build_carrier_record
 from db import carrier_exists, upsert_carriers, upsert_shipment
-from extractors import extract_carrier_id
 from shipment_processor import build_record
 from turvo_client import TurvoAuthError, fetch_carrier_details, fetch_shipment_details
 from webhook_queue import (
@@ -62,12 +62,15 @@ def process_one(event: Dict[str, Any], max_attempts: int) -> None:
         logger.info("Shipment fetched | shipment_id=%s", shipment_id)
 
         record = build_record(shipment)
+        # Resolves both ZIPs to DAT market areas. Never raises: a market is
+        # advisory, and losing a whole shipment event over one would be absurd.
+        kma.annotate_record(record)
+        record["carrier_id_source"] = "turvo" if record.get("carrier_id") is not None else None
         logger.info("Record built | shipment_id=%s record=%s", shipment_id, record)
 
         upsert_shipment(record)
 
-        details = shipment.get("details") or shipment
-        carrier_id = extract_carrier_id(details)
+        carrier_id = record.get("carrier_id")
         if carrier_id is not None:
             sync_carrier(carrier_id)
         else:

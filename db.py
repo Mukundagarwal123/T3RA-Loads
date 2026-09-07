@@ -10,6 +10,59 @@ logger = logging.getLogger(__name__)
 
 _SCHEMA_READY = False
 _CARRIER_SCHEMA_READY = False
+_MIGRATIONS_READY = False
+
+# Statements applied by apply_migrations(). Every one is idempotent, so there is
+# no version table and no ordering state to keep - re-running is always safe.
+#
+# Adding a column to the CREATE TABLE in ensure_schema() does nothing on a
+# database where the table already exists, so anything beyond the original
+# columns has to live here as well.
+MIGRATIONS = [
+    """
+    CREATE TABLE IF NOT EXISTS kma_markets (
+        market_id   TEXT PRIMARY KEY,
+        market_name TEXT NOT NULL,
+        ref_city    TEXT,
+        ref_state   TEXT,
+        country     TEXT NOT NULL,
+        created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+        updated_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    """,
+    """
+    CREATE TABLE IF NOT EXISTS kma_postal_prefixes (
+        prefix     VARCHAR(3) PRIMARY KEY,
+        country    TEXT NOT NULL,
+        market_id  TEXT NOT NULL REFERENCES kma_markets(market_id),
+        updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+    );
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_kma_prefixes_market ON kma_postal_prefixes (market_id);",
+    """
+    CREATE TABLE IF NOT EXISTS kma_expanded_prefixes (
+        market_id TEXT NOT NULL REFERENCES kma_markets(market_id),
+        prefix    VARCHAR(3) NOT NULL,
+        PRIMARY KEY (market_id, prefix)
+    );
+    """,
+    "CREATE INDEX IF NOT EXISTS idx_kma_expanded_prefix ON kma_expanded_prefixes (prefix);",
+    """
+    CREATE TABLE IF NOT EXISTS kma_regions (
+        region_name TEXT NOT NULL,
+        prefix      VARCHAR(3) NOT NULL,
+        PRIMARY KEY (region_name, prefix)
+    );
+    """,
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS origin_kma TEXT;",
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS destination_kma TEXT;",
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS kma_mapped_at TIMESTAMPTZ;",
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id BIGINT;",
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id_source TEXT;",
+    f"CREATE INDEX IF NOT EXISTS idx_rcs_lane_kma ON {config.TABLE_NAME} (origin_kma, destination_kma);",
+    f"CREATE INDEX IF NOT EXISTS idx_rcs_carrier_id ON {config.TABLE_NAME} (carrier_id);",
+    f"CREATE INDEX IF NOT EXISTS idx_rcs_kma_todo ON {config.TABLE_NAME} (id) WHERE kma_mapped_at IS NULL;",
+]
 
 
 @contextmanager
@@ -25,6 +78,27 @@ def get_conn():
         yield conn
     finally:
         conn.close()
+
+
+def apply_migrations(force: bool = False) -> None:
+    """Bring the schema up to date. Idempotent, safe to call from anywhere.
+
+    Called by migrate.py as an explicit deploy step, and by ensure_schema() as a
+    safety net - deploying code that references a column the database does not
+    have would fail every shipment, so it must not be possible.
+    """
+    global _MIGRATIONS_READY
+    if _MIGRATIONS_READY and not force:
+        return
+
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            for statement in MIGRATIONS:
+                cur.execute(statement)
+        conn.commit()
+    _MIGRATIONS_READY = True
+    logger.info("Migrations applied | statements=%d", len(MIGRATIONS))
+
 
 
 def ensure_schema() -> None:
@@ -53,6 +127,11 @@ def ensure_schema() -> None:
         carrier_freight_cost NUMERIC,
         customer_total_cost NUMERIC,
         carrier_total_cost NUMERIC,
+        origin_kma TEXT,
+        destination_kma TEXT,
+        kma_mapped_at TIMESTAMPTZ,
+        carrier_id BIGINT,
+        carrier_id_source TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
@@ -61,6 +140,9 @@ def ensure_schema() -> None:
         with conn.cursor() as cur:
             cur.execute(q)
         conn.commit()
+    # The CREATE above only covers a fresh database; on an existing one the
+    # newer columns arrive through the migration list.
+    apply_migrations()
     _SCHEMA_READY = True
     logger.info("Table ensured | table_name=%s", config.TABLE_NAME)
 
@@ -77,6 +159,8 @@ def upsert_shipment(record: dict) -> None:
         customer_name, carrier_name,
         customer_freight_cost, carrier_freight_cost,
         customer_total_cost, carrier_total_cost,
+        origin_kma, destination_kma, kma_mapped_at,
+        carrier_id, carrier_id_source,
         updated_at
     )
     VALUES (
@@ -87,6 +171,8 @@ def upsert_shipment(record: dict) -> None:
         %(customer_name)s, %(carrier_name)s,
         %(customer_freight_cost)s, %(carrier_freight_cost)s,
         %(customer_total_cost)s, %(carrier_total_cost)s,
+        %(origin_kma)s, %(destination_kma)s, %(kma_mapped_at)s,
+        %(carrier_id)s, %(carrier_id_source)s,
         NOW()
     )
     ON CONFLICT (shipment_num) DO UPDATE SET
@@ -107,6 +193,11 @@ def upsert_shipment(record: dict) -> None:
         carrier_freight_cost = EXCLUDED.carrier_freight_cost,
         customer_total_cost = EXCLUDED.customer_total_cost,
         carrier_total_cost = EXCLUDED.carrier_total_cost,
+        origin_kma = EXCLUDED.origin_kma,
+        destination_kma = EXCLUDED.destination_kma,
+        kma_mapped_at = EXCLUDED.kma_mapped_at,
+        carrier_id = EXCLUDED.carrier_id,
+        carrier_id_source = EXCLUDED.carrier_id_source,
         updated_at = NOW();
     """
 
@@ -196,4 +287,136 @@ def upsert_carriers(records: list) -> int:
         return len(records)
     except Exception:
         logger.exception("Carrier upsert FAILED | rows=%d", len(records))
+        raise
+
+
+# ---------------------------------------------------------------------------
+# KMA reference data (DAT market areas)
+# ---------------------------------------------------------------------------
+
+def _bulk_upsert(query: str, template: str, records: list, label: str) -> int:
+    if not records:
+        return 0
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                execute_values(cur, query, records, template=template, page_size=500)
+            conn.commit()
+        logger.info("%s upsert SUCCEEDED | rows=%d", label, len(records))
+        return len(records)
+    except Exception:
+        logger.exception("%s upsert FAILED | rows=%d", label, len(records))
+        raise
+
+
+def upsert_kma_markets(records: list) -> int:
+    apply_migrations()
+    query = """
+    INSERT INTO kma_markets (market_id, market_name, ref_city, ref_state, country, updated_at)
+    VALUES %s
+    ON CONFLICT (market_id) DO UPDATE SET
+        market_name = EXCLUDED.market_name,
+        ref_city = EXCLUDED.ref_city,
+        ref_state = EXCLUDED.ref_state,
+        country = EXCLUDED.country,
+        updated_at = NOW();
+    """
+    template = "(%(market_id)s, %(market_name)s, %(ref_city)s, %(ref_state)s, %(country)s, NOW())"
+    return _bulk_upsert(query, template, records, "KMA market")
+
+
+def upsert_kma_postal_prefixes(records: list) -> int:
+    apply_migrations()
+    query = """
+    INSERT INTO kma_postal_prefixes (prefix, country, market_id, updated_at)
+    VALUES %s
+    ON CONFLICT (prefix) DO UPDATE SET
+        country = EXCLUDED.country,
+        market_id = EXCLUDED.market_id,
+        updated_at = NOW();
+    """
+    template = "(%(prefix)s, %(country)s, %(market_id)s, NOW())"
+    return _bulk_upsert(query, template, records, "KMA prefix")
+
+
+def upsert_kma_expanded_prefixes(records: list) -> int:
+    apply_migrations()
+    query = """
+    INSERT INTO kma_expanded_prefixes (market_id, prefix)
+    VALUES %s
+    ON CONFLICT (market_id, prefix) DO NOTHING;
+    """
+    return _bulk_upsert(query, "(%(market_id)s, %(prefix)s)", records, "KMA expanded")
+
+
+def upsert_kma_regions(records: list) -> int:
+    apply_migrations()
+    query = """
+    INSERT INTO kma_regions (region_name, prefix)
+    VALUES %s
+    ON CONFLICT (region_name, prefix) DO NOTHING;
+    """
+    return _bulk_upsert(query, "(%(region_name)s, %(prefix)s)", records, "KMA region")
+
+
+def fetch_kma_prefix_map() -> dict:
+    """Every postal prefix mapped to its market. Read once per process by kma.py."""
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute("SELECT prefix, market_id FROM kma_postal_prefixes;")
+            return {row[0]: row[1] for row in cur.fetchall()}
+
+
+# ---------------------------------------------------------------------------
+# Market backfill
+# ---------------------------------------------------------------------------
+
+def iter_shipments_for_kma(after_id: int, batch_size: int, include_mapped: bool = False) -> list:
+    """One keyset page of shipments needing markets, ordered by id.
+
+    Keyset rather than OFFSET so the scan cost does not grow as the backfill
+    progresses, and so rows written by the worker mid-run cannot shift the page
+    boundary and make us skip one.
+    """
+    where = "" if include_mapped else "AND kma_mapped_at IS NULL"
+    query = f"""
+    SELECT id, origin_zip, destination_zip
+    FROM {config.TABLE_NAME}
+    WHERE id > %s {where}
+    ORDER BY id
+    LIMIT %s;
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, (after_id, batch_size))
+            return [
+                {"id": row[0], "origin_zip": row[1], "destination_zip": row[2]}
+                for row in cur.fetchall()
+            ]
+
+
+def update_shipment_kma(rows: list) -> int:
+    """Write markets for a batch. Each row needs id, origin_kma, destination_kma."""
+    if not rows:
+        return 0
+
+    query = f"""
+    UPDATE {config.TABLE_NAME} AS s
+    SET origin_kma = v.origin_kma,
+        destination_kma = v.destination_kma,
+        kma_mapped_at = NOW()
+    FROM (VALUES %s) AS v(id, origin_kma, destination_kma)
+    WHERE s.id = v.id;
+    """
+    template = "(%(id)s::bigint, %(origin_kma)s::text, %(destination_kma)s::text)"
+
+    try:
+        with get_conn() as conn:
+            with conn.cursor() as cur:
+                execute_values(cur, query, rows, template=template, page_size=500)
+                written = cur.rowcount
+            conn.commit()
+        return written
+    except Exception:
+        logger.exception("KMA backfill update FAILED | rows=%d", len(rows))
         raise
