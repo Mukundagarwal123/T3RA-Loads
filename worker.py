@@ -4,12 +4,19 @@ import socket
 import time
 from typing import Any, Dict
 
+import config
 from carrier_processor import build_carrier_record
 from db import carrier_exists, upsert_carriers, upsert_shipment
 from extractors import extract_carrier_id
 from shipment_processor import build_record
-from turvo_client import fetch_carrier_details, fetch_shipment_details
-from webhook_queue import claim_events, ensure_schema, mark_done, mark_retry_or_dead
+from turvo_client import TurvoAuthError, fetch_carrier_details, fetch_shipment_details
+from webhook_queue import (
+    claim_events,
+    defer_for_auth,
+    ensure_schema,
+    mark_done,
+    mark_retry_or_dead,
+)
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s %(message)s")
 logger = logging.getLogger("worker")
@@ -30,6 +37,9 @@ def sync_carrier(carrier_id: int) -> None:
         logger.info(
             "Carrier added | carrier_id=%s name=%s", carrier_id, carrier_record.get("name"),
         )
+    except TurvoAuthError:
+        # Never swallowed: the caller has to stop working, not carry on.
+        raise
     except Exception:
         # Carrier sync is a side effect of shipment processing; a failure here
         # shouldn't fail/retry the whole shipment event.
@@ -68,6 +78,15 @@ def process_one(event: Dict[str, Any], max_attempts: int) -> None:
             "Event DONE | event_id=%s shipment_id=%s shipment_num=%s",
             event_id, shipment_id, record.get("shipment_num"),
         )
+    except TurvoAuthError as e:
+        # Retrying would re-send the same rejected credentials and lock the
+        # Turvo account out. Park the event and let main() stop working.
+        defer_for_auth(event_id, config.AUTH_COOLDOWN_SECONDS, repr(e))
+        logger.error(
+            "Event DEFERRED, Turvo auth failed | event_id=%s shipment_id=%s error=%s",
+            event_id, shipment_id, e,
+        )
+        raise
     except Exception as e:
         err = repr(e)
         mark_retry_or_dead(event_id, attempt_count, max_attempts, err)
@@ -98,8 +117,25 @@ def main() -> None:
             continue
 
         logger.info("Claimed %s queue event(s)", len(events))
-        for e in events:
-            process_one(e, args.max_attempts)
+        failed_at_index = None
+        try:
+            for i, e in enumerate(events):
+                failed_at_index = i
+                process_one(e, args.max_attempts)
+        except TurvoAuthError as auth_err:
+            # Every remaining event would fail the same way. Park the rest of
+            # the batch and idle, so one bad password can't turn a backlog into
+            # hundreds of failed login attempts.
+            for remaining in events[failed_at_index + 1:]:
+                defer_for_auth(int(remaining["id"]), config.AUTH_COOLDOWN_SECONDS, repr(auth_err))
+            logger.error(
+                "Turvo auth failed; pausing worker for %ss. Fix TURVO_PASSWORD in .env, "
+                "then restart the service. | error=%s",
+                config.AUTH_COOLDOWN_SECONDS, auth_err,
+            )
+            time.sleep(config.AUTH_COOLDOWN_SECONDS)
+            last_heartbeat = time.time()
+            continue
         last_heartbeat = time.time()
 
 

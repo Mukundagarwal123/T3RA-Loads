@@ -113,6 +113,28 @@ def mark_ignored(event_id: int, reason: str) -> None:
         conn.commit()
 
 
+def defer_for_auth(event_id: int, cooldown_seconds: int, error_text: str) -> None:
+    """Park an event that failed purely because Turvo rejected our credentials.
+
+    The event keeps its data and is retried once the credentials are fixed, but
+    the attempt is refunded so a credential outage doesn't burn through
+    max_attempts and kill the whole backlog.
+    """
+    next_time = datetime.utcnow() + timedelta(seconds=cooldown_seconds)
+    q = """
+    UPDATE public.webhook_queue
+    SET state='retry',
+        next_attempt_at=%s,
+        attempt_count=GREATEST(0, attempt_count - 1),
+        last_error=%s
+    WHERE id=%s;
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(q, (next_time, error_text[:4000], event_id))
+        conn.commit()
+
+
 def mark_retry_or_dead(event_id: int, attempt_count: int, max_attempts: int, error_text: str) -> None:
     if attempt_count >= max_attempts:
         q = "UPDATE public.webhook_queue SET state='dead', processed_at=NOW(), last_error=%s WHERE id=%s;"

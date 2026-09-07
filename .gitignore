@@ -4,3 +4,6 @@ __pycache__/
 *.pyc
 .idea/
 *.log
+.turvo_token.json
+.turvo_token.json.lock
+.watchdog_state.json

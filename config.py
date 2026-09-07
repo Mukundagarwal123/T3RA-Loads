@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from dotenv import load_dotenv
 
@@ -26,6 +27,19 @@ TURVO_CLIENT_SECRET = _req("TURVO_CLIENT_SECRET")
 TURVO_API_KEY = _req("TURVO_API_KEY")
 TURVO_USERNAME = _req("TURVO_USERNAME")
 TURVO_PASSWORD = _req("TURVO_PASSWORD")
+
+# Turvo has no refresh-token flow for us: every token acquisition is a full
+# login event on their side. Cache the token on disk so all processes (webhook,
+# worker, ad-hoc scripts) and restarts share one login instead of each making
+# their own.
+TOKEN_CACHE_PATH = os.getenv(
+    "TOKEN_CACHE_PATH", str(Path(__file__).parent / ".turvo_token.json"),
+)
+
+# After Turvo rejects our credentials, refuse to attempt another login for this
+# long. Without it, the queue's retry ladder replays a bad password until the
+# account locks out.
+AUTH_COOLDOWN_SECONDS = int(os.getenv("AUTH_COOLDOWN_SECONDS", "900"))
 
 WEBHOOK_SHARED_TOKEN = _req("WEBHOOK_SHARED_TOKEN")
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhooks/turvo")
