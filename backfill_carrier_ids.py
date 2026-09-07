@@ -65,8 +65,11 @@ APPLY_SQL = f"""
 WITH unambiguous AS ({_UNAMBIGUOUS})
 UPDATE {config.TABLE_NAME} s
 SET carrier_id = u.carrier_id,
-    carrier_id_source = 'name_match',
-    updated_at = NOW()
+    carrier_id_source = 'name_match'
+-- updated_at is deliberately left alone. It records when the shipment data
+-- last changed, and recovering an id we already had is not a change to the
+-- shipment. Bumping it would make the whole table look freshly modified, and
+-- the old timestamps are not recoverable.
 FROM unambiguous u
 WHERE s.carrier_id IS NULL
   AND s.carrier_name IS NOT NULL

@@ -45,11 +45,20 @@ def normalize_postal(value: Optional[str]) -> Optional[Tuple[str, str]]:
     if _CANADIAN_RE.match(cleaned):
         return cleaned[:3], "CA"
 
-    if cleaned.isdigit() and len(cleaned) in (5, 9):
-        # 5 = ZIP, 9 = ZIP+4 with the dash already removed. Shorter inputs are
-        # rejected rather than padded: a 4-digit value is truncation damage, and
-        # guessing at it would map the load somewhere confidently wrong.
-        return cleaned[:3], "US"
+    if cleaned.isdigit():
+        # 4 and 8 digits mean a leading zero was eaten upstream - the same
+        # spreadsheet damage the reference data suffers, arriving here in the
+        # shipment feed. Restoring it is deterministic, not a guess: no US ZIP
+        # is four digits long, so 8512 can only ever have been 08512. Without
+        # this, New Jersey and New England quietly fail to map.
+        if len(cleaned) in (4, 8):
+            cleaned = cleaned.zfill(len(cleaned) + 1)
+
+        # 5 = ZIP, 9 = ZIP+4 with the dash already removed. Anything shorter is
+        # too damaged to reconstruct - 512 could be 00512 or a bare prefix - and
+        # guessing would place the load somewhere confidently wrong.
+        if len(cleaned) in (5, 9):
+            return cleaned[:3], "US"
 
     return None
 
