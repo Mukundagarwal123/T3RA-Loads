@@ -10,9 +10,12 @@ auth cooldown exists to prevent.
 
 Name matching instead, with two hard rules:
 
-  * exact match on lower(btrim(name)) only, never fuzzy. Stripping LLC/INC
-    collapses "Smith Trucking LLC" and "Smith Trucking Inc" - different MC
-    numbers, different companies - and no downstream report would reveal it.
+  * names are compared with punctuation and spacing removed, and nothing more.
+    The carriers table holds 'Jj Barn Transport  Inc' while their 252 loads say
+    'Jj Barn Transport, Inc' - the comma does not change which company is meant.
+    Stripping LLC/INC would, collapsing "Smith Trucking LLC" and "Smith Trucking
+    Inc" - different MC numbers, different companies - and no downstream report
+    would ever reveal it.
   * a name held by more than one carrier is skipped, not guessed at. carriers
     has no unique constraint on name and is fed by both the CSV import and the
     API sync, so duplicates are expected.
@@ -31,9 +34,24 @@ import db
 logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(message)s")
 logger = logging.getLogger(__name__)
 
-# Carrier names that are unique in the carriers table, and so safe to match on.
+def _key(column: str) -> str:
+    """Normalise a carrier name for matching: lowercase, letters and digits only.
+
+    Punctuation and spacing differ between how a name was typed on the carrier
+    record and how it came through on the load - the carriers table holds
+    'Jj Barn Transport  Inc' while their 252 loads say 'Jj Barn Transport, Inc'.
+    Dropping the comma is safe: it does not change which company is meant.
+
+    This is as far as the normalisation goes. Stripping LLC/INC would collapse
+    "Smith Trucking LLC" and "Smith Trucking Inc" - different MC numbers,
+    different companies - and no downstream report would ever reveal it.
+    """
+    return f"regexp_replace(lower(btrim({column})), '[^a-z0-9]', '', 'g')"
+
+
+# Carrier names unique in the carriers table, and so safe to match on.
 _UNAMBIGUOUS = f"""
-    SELECT lower(btrim(name)) AS name_key, min(carrier_id) AS carrier_id
+    SELECT {_key('name')} AS name_key, min(carrier_id) AS carrier_id
     FROM {config.CARRIER_TABLE_NAME}
     WHERE name IS NOT NULL AND btrim(name) <> ''
     GROUP BY 1
@@ -49,11 +67,11 @@ SELECT
                        AND s.carrier_name IS NOT NULL)                   AS no_match,
     count(*) FILTER (WHERE s.carrier_name IS NULL)                       AS no_name
 FROM {config.TABLE_NAME} s
-LEFT JOIN unambiguous u ON u.name_key = lower(btrim(s.carrier_name));
+LEFT JOIN unambiguous u ON u.name_key = regexp_replace(lower(btrim(s.carrier_name)), '[^a-z0-9]', '', 'g');
 """
 
 AMBIGUOUS_SQL = f"""
-SELECT lower(btrim(name)) AS name_key, count(*) AS carriers
+SELECT {_key('name')} AS name_key, count(*) AS carriers
 FROM {config.CARRIER_TABLE_NAME}
 WHERE name IS NOT NULL AND btrim(name) <> ''
 GROUP BY 1 HAVING count(*) > 1
@@ -73,7 +91,7 @@ SET carrier_id = u.carrier_id,
 FROM unambiguous u
 WHERE s.carrier_id IS NULL
   AND s.carrier_name IS NOT NULL
-  AND lower(btrim(s.carrier_name)) = u.name_key;
+  AND regexp_replace(lower(btrim(s.carrier_name)), '[^a-z0-9]', '', 'g') = u.name_key;
 """
 
 
