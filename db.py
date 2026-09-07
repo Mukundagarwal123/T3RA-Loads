@@ -415,17 +415,105 @@ def update_shipment_kma(rows: list) -> int:
         destination_kma = v.destination_kma,
         kma_mapped_at = NOW()
     FROM (VALUES %s) AS v(id, origin_kma, destination_kma)
-    WHERE s.id = v.id;
+    WHERE s.id = v.id
+    RETURNING s.id;
     """
     template = "(%(id)s::bigint, %(origin_kma)s::text, %(destination_kma)s::text)"
 
     try:
         with get_conn() as conn:
             with conn.cursor() as cur:
-                execute_values(cur, query, rows, template=template, page_size=500)
-                written = cur.rowcount
+                # fetch=True, not cur.rowcount: execute_values sends the rows
+                # in pages and rowcount only reports the last one.
+                written = len(execute_values(
+                    cur, query, rows, template=template, page_size=500, fetch=True))
             conn.commit()
         return written
     except Exception:
         logger.exception("KMA backfill update FAILED | rows=%d", len(rows))
         raise
+
+
+# ---------------------------------------------------------------------------
+# Carrier id resolution
+# ---------------------------------------------------------------------------
+
+def iter_unresolved_carrier_loads(after_id: int, batch_size: int, carrier_name: str = None) -> list:
+    """Loads carrying a carrier name we could not turn into an id.
+
+    These are the rows where the name is held by more than one carrier, or by
+    none at all. Neither can be settled from what the load stored - only Turvo
+    knows which carrier was actually on the shipment.
+    """
+    name_filter = "AND lower(btrim(carrier_name)) = lower(btrim(%s))" if carrier_name else ""
+    params = [after_id]
+    if carrier_name:
+        params.append(carrier_name)
+    params.append(batch_size)
+
+    query = f"""
+    SELECT id, shipment_num, shipment_id, carrier_name
+    FROM {config.TABLE_NAME}
+    WHERE id > %s AND carrier_id IS NULL AND shipment_id IS NOT NULL {name_filter}
+    ORDER BY id
+    LIMIT %s;
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(query, params)
+            return [
+                {"id": r[0], "shipment_num": r[1], "shipment_id": r[2], "carrier_name": r[3]}
+                for r in cur.fetchall()
+            ]
+
+
+def set_shipment_carrier_ids(rows: list) -> int:
+    """Write authoritative carrier ids. Each row needs id and carrier_id.
+
+    updated_at is left alone deliberately: recovering an id we always had is
+    not a change to the shipment.
+    """
+    if not rows:
+        return 0
+
+    query = f"""
+    UPDATE {config.TABLE_NAME} AS s
+    SET carrier_id = v.carrier_id, carrier_id_source = 'turvo'
+    FROM (VALUES %s) AS v(id, carrier_id)
+    WHERE s.id = v.id
+    RETURNING s.id;
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            # fetch=True, not cur.rowcount: execute_values pages the rows and
+            # rowcount only reports the last page.
+            written = len(execute_values(
+                cur, query, rows,
+                template="(%(id)s::bigint, %(carrier_id)s::bigint)",
+                page_size=200, fetch=True))
+        conn.commit()
+    return written
+
+
+def set_shipment_carrier_ids_from_export(rows: list) -> int:
+    """Write carrier ids sourced from a Turvo export. Each row needs id, carrier_id."""
+    if not rows:
+        return 0
+
+    query = f"""
+    UPDATE {config.TABLE_NAME} AS s
+    SET carrier_id = v.carrier_id, carrier_id_source = 'turvo_export'
+    FROM (VALUES %s) AS v(id, carrier_id)
+    WHERE s.id = v.id
+    RETURNING s.id;
+    """
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            # fetch=True, not cur.rowcount: execute_values pages the rows and
+            # rowcount only reports the last page.
+            written = len(execute_values(
+                cur, query, rows,
+                template="(%(id)s::bigint, %(carrier_id)s::bigint)",
+                page_size=500, fetch=True))
+        conn.commit()
+    return written

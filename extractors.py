@@ -98,29 +98,37 @@ def extract_customer_name(details: Dict[str, Any]) -> Optional[str]:
     return None
 
 
+def _carrier_orders_excluding_lumper(details: Dict[str, Any]) -> List[dict]:
+    """Carrier orders that represent an actual haul.
+
+    "Lumper Advance" is a fee line, not a trucking company - it has its own
+    account (7028286) purely so the charge can be billed. Both of the lookups
+    below used to fall back to carrierOrder[0] when they found nothing else,
+    which on a shipment whose only order was the lumper fee stored the lumper as
+    the carrier. That put 45 loads under "Lumper Advance runs Stockton to
+    Stockton", and nothing downstream could tell it was nonsense.
+
+    Returning nothing is the right answer there: a blank is visibly missing, a
+    fee line dressed as a carrier is invisibly wrong.
+    """
+    orders = details.get("carrierOrder") or []
+    live = [co for co in orders if co.get("deleted") is False]
+    candidates = live or orders
+    return [co for co in candidates
+            if (co.get("carrier") or {}).get("name") != LUMPER_CARRIER_NAME]
+
+
 def extract_carrier_name(details: Dict[str, Any]) -> Optional[str]:
-    carrier_orders = details.get("carrierOrder") or []
-    for co in carrier_orders:
-        if co.get("deleted") is False:
-            name = (co.get("carrier") or {}).get("name")
-            if name and name != LUMPER_CARRIER_NAME:
-                return name
-    if carrier_orders:
-        name = (carrier_orders[0].get("carrier") or {}).get("name")
+    for co in _carrier_orders_excluding_lumper(details):
+        name = (co.get("carrier") or {}).get("name")
         if name:
             return name
     return None
 
 
 def extract_carrier_id(details: Dict[str, Any]) -> Optional[int]:
-    carrier_orders = details.get("carrierOrder") or []
-    for co in carrier_orders:
-        if co.get("deleted") is False:
-            carrier = co.get("carrier") or {}
-            if carrier.get("id") and carrier.get("name") != LUMPER_CARRIER_NAME:
-                return carrier.get("id")
-    if carrier_orders:
-        carrier_id = (carrier_orders[0].get("carrier") or {}).get("id")
+    for co in _carrier_orders_excluding_lumper(details):
+        carrier_id = (co.get("carrier") or {}).get("id")
         if carrier_id:
             return carrier_id
     return None
