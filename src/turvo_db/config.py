@@ -41,6 +41,13 @@ TOKEN_CACHE_PATH = os.getenv(
 # account locks out.
 AUTH_COOLDOWN_SECONDS = int(os.getenv("AUTH_COOLDOWN_SECONDS", "900"))
 
+# webhook_queue keeps every event forever, payload included, which makes it the
+# fastest-growing table here. Done events are dropped once no re-delivery could
+# plausibly still arrive, and their payloads - the bulk of the bytes - go
+# earlier than that, leaving the row so event_key still dedupes.
+QUEUE_PAYLOAD_RETENTION_DAYS = int(os.getenv("QUEUE_PAYLOAD_RETENTION_DAYS", "30"))
+QUEUE_EVENT_RETENTION_DAYS = int(os.getenv("QUEUE_EVENT_RETENTION_DAYS", "90"))
+
 WEBHOOK_SHARED_TOKEN = _req("WEBHOOK_SHARED_TOKEN")
 WEBHOOK_PATH = os.getenv("WEBHOOK_PATH", "/webhooks/turvo")
 

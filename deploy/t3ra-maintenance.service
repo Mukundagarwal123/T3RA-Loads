@@ -1,0 +1,11 @@
+# Nightly housekeeping: trims completed webhook queue events.
+# Install: sudo cp deploy/t3ra-maintenance.* /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now t3ra-maintenance.timer
+[Unit]
+Description=T3RA nightly maintenance
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/turvo-db
+ExecStart=/home/ubuntu/turvo-db/.venv/bin/python scripts/purge_queue.py

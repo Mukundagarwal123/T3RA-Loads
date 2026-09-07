@@ -33,6 +33,8 @@ def ensure_schema() -> None:
         last_error TEXT
     );
 
+    CREATE INDEX IF NOT EXISTS idx_webhook_queue_state_received
+        ON public.webhook_queue (state, received_at);
     CREATE INDEX IF NOT EXISTS idx_webhook_queue_state_next
       ON public.webhook_queue (state, next_attempt_at, received_at);
     """
@@ -149,3 +151,74 @@ def mark_retry_or_dead(event_id: int, attempt_count: int, max_attempts: int, err
         with conn.cursor() as cur:
             cur.execute(q, params)
         conn.commit()
+
+
+def purge_old_events(payload_days: int = None, event_days: int = None,
+                     dry_run: bool = False) -> dict:
+    """Trim completed queue events so the table stops growing without bound.
+
+    This table is the closest thing here to a log: every webhook is kept, with
+    its full payload, and nothing ever removed one. At ~160 events a day it is
+    already the second largest table in the database.
+
+    Two stages, because the payload and the row are worth different amounts:
+
+    * The payload is most of the bytes and is only useful while a failure is
+      still being investigated, so it is cleared first.
+    * The row itself carries event_key, which is what stops Turvo re-delivering
+      a webhook and having us reprocess the shipment. Dropping it early would
+      cost a wasted API call on a re-delivery, so rows go much later.
+
+    Events in the 'dead' state are never touched. They failed every retry, they
+    are few, and their payload is exactly what you need to work out why.
+    """
+    payload_days = config.QUEUE_PAYLOAD_RETENTION_DAYS if payload_days is None else payload_days
+    event_days = config.QUEUE_EVENT_RETENTION_DAYS if event_days is None else event_days
+
+    finished = ("done", "ignored")
+    counts = {}
+
+    with get_conn() as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                """SELECT count(*) FROM webhook_queue
+                   WHERE state = ANY(%s) AND payload_json IS NOT NULL
+                     AND received_at < NOW() - make_interval(days => %s);""",
+                (list(finished), payload_days),
+            )
+            counts["payloads_to_clear"] = cur.fetchone()[0]
+
+            cur.execute(
+                """SELECT count(*) FROM webhook_queue
+                   WHERE state = ANY(%s)
+                     AND received_at < NOW() - make_interval(days => %s);""",
+                (list(finished), event_days),
+            )
+            counts["events_to_delete"] = cur.fetchone()[0]
+
+            if dry_run:
+                return counts
+
+            # Deleting first would make the payload update do redundant work.
+            cur.execute(
+                """UPDATE webhook_queue SET payload_json = NULL
+                   WHERE state = ANY(%s) AND payload_json IS NOT NULL
+                     AND received_at < NOW() - make_interval(days => %s);""",
+                (list(finished), payload_days),
+            )
+            counts["payloads_cleared"] = cur.rowcount
+
+            cur.execute(
+                """DELETE FROM webhook_queue
+                   WHERE state = ANY(%s)
+                     AND received_at < NOW() - make_interval(days => %s);""",
+                (list(finished), event_days),
+            )
+            counts["events_deleted"] = cur.rowcount
+        conn.commit()
+
+    logger.info(
+        "Queue purge | payloads_cleared=%s events_deleted=%s payload_days=%s event_days=%s",
+        counts.get("payloads_cleared"), counts.get("events_deleted"), payload_days, event_days,
+    )
+    return counts
