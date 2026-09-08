@@ -1,0 +1,63 @@
+name: Deploy
+
+# Deploys on every push to main, and on demand from the Actions tab.
+#
+# The server keeps its own .env, which is gitignored and never touched here.
+# Migrations run before the services restart: new code against an old schema
+# fails every shipment, so the ordering is the whole point.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  # Two deploys at once would race on the same working tree.
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: Deploy over SSH
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.DEPLOY_HOST }}
+          username: ${{ secrets.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          script_stop: true          # stop at the first failing command
+          command_timeout: 10m
+          script: |
+            set -euo pipefail
+            cd /home/ubuntu/app
+
+            echo "== Pulling =="
+            git fetch origin main
+            git reset --hard origin/main      # discard any hand-edits on the box
+
+            echo "== Installing =="
+            .venv/bin/pip install -e . -q
+
+            echo "== Migrating =="
+            .venv/bin/python scripts/migrate.py
+
+            echo "== Restarting =="
+            sudo systemctl restart t3ra-webhook t3ra-worker
+
+            echo "== Health =="
+            sleep 3
+            systemctl is-active t3ra-webhook t3ra-worker
+            curl -fsS http://localhost:8000/health
+
+      - name: Report
+        if: always()
+        run: |
+          if [ "${{ job.status }}" = "success" ]; then
+            echo "Deployed ${{ github.sha }} to production."
+          else
+            echo "Deploy FAILED. The previous version is still running:"
+            echo "  git reset --hard is the only destructive step and it runs before"
+            echo "  the restart, so a failure after it leaves the services on old code."
+          fi

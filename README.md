@@ -64,9 +64,20 @@ cp .env.example .env        # then fill it in
 .venv/bin/python -m turvo_db.worker
 ```
 
-Deploy with `deploy/deploy.sh`, which pulls, installs, migrates and restarts
-both systemd units. Migrations run **before** the restart: new code against an
-old schema fails every shipment.
+## Deploying
+
+Push to `main`. `.github/workflows/deploy.yml` SSHes to the box, pulls,
+installs, migrates and restarts both units. Migrations run **before** the
+restart: new code against an old schema fails every shipment.
+
+Needs three repository secrets: `DEPLOY_HOST`, `DEPLOY_USER`, `DEPLOY_SSH_KEY`.
+
+First time on a host, run `deploy/server-setup.sh` once by hand - it installs
+the systemd units, grants the deploy user a passwordless `systemctl restart`
+for just those two services, and stops anything previously started over SSH.
+`deploy/deploy.sh` remains as a manual fallback.
+
+Logs go to journald: `journalctl -u t3ra-worker -f`.
 
 ## Market areas
 

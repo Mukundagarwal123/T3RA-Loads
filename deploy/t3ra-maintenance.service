@@ -7,5 +7,5 @@ Description=T3RA nightly maintenance
 [Service]
 Type=oneshot
 User=ubuntu
-WorkingDirectory=/home/ubuntu/turvo-db
-ExecStart=/home/ubuntu/turvo-db/.venv/bin/python scripts/purge_queue.py
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python scripts/purge_queue.py

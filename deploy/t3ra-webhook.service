@@ -7,8 +7,8 @@ After=network.target
 [Service]
 Type=simple
 User=ubuntu
-WorkingDirectory=/home/ubuntu/turvo-db
-ExecStart=/home/ubuntu/turvo-db/.venv/bin/python -m turvo_db.webhook_server
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python -m turvo_db.webhook_server
 Restart=always
 RestartSec=5
 

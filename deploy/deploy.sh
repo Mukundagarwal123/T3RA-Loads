@@ -1,6 +1,9 @@
 #!/bin/bash
 set -e
 
+# Manual fallback. The normal path is GitHub Actions on push to main
+# (.github/workflows/deploy.yml); use this when you need to deploy from the box
+# itself, e.g. Actions cannot reach the host.
 echo "=== T3RA Loads - Production Deploy ==="
 echo "Branch: $(git rev-parse --abbrev-ref HEAD)"
 echo "Pulling latest from main..."
