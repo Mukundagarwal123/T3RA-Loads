@@ -88,6 +88,7 @@ MIGRATIONS = [
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS kma_mapped_at TIMESTAMPTZ;",
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id BIGINT;",
     f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_id_source TEXT;",
+    f"ALTER TABLE {config.TABLE_NAME} ADD COLUMN IF NOT EXISTS carrier_am TEXT;",
     # pickup_date/delivery_date were TEXT holding MM/DD/YYYY, which Postgres
     # compares as strings - month first, year last - so they could not be
     # sorted or filtered by time. Converted in place rather than replaced by new
@@ -171,6 +172,7 @@ def ensure_schema() -> None:
         kma_mapped_at TIMESTAMPTZ,
         carrier_id BIGINT,
         carrier_id_source TEXT,
+        carrier_am TEXT,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
         updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );
@@ -200,6 +202,7 @@ def upsert_shipment(record: dict) -> None:
         customer_total_cost, carrier_total_cost,
         origin_kma, destination_kma, kma_mapped_at,
         carrier_id, carrier_id_source,
+        carrier_am,
         updated_at
     )
     VALUES (
@@ -212,6 +215,7 @@ def upsert_shipment(record: dict) -> None:
         %(customer_total_cost)s, %(carrier_total_cost)s,
         %(origin_kma)s, %(destination_kma)s, %(kma_mapped_at)s,
         %(carrier_id)s, %(carrier_id_source)s,
+        %(carrier_am)s,
         NOW()
     )
     ON CONFLICT (shipment_num) DO UPDATE SET
@@ -237,6 +241,7 @@ def upsert_shipment(record: dict) -> None:
         kma_mapped_at = EXCLUDED.kma_mapped_at,
         carrier_id = EXCLUDED.carrier_id,
         carrier_id_source = EXCLUDED.carrier_id_source,
+        carrier_am = EXCLUDED.carrier_am,
         updated_at = NOW();
     """
 

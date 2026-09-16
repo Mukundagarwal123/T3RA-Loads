@@ -130,6 +130,20 @@ def extract_carrier_id(details: Dict[str, Any]) -> Optional[int]:
     return None
 
 
+def extract_carrier_am(details: Dict[str, Any]) -> Optional[str]:
+    """The carrier's account manager - the Turvo owner of the carrier account.
+
+    Read off the same carrier order extract_carrier_name picks, so the AM always
+    belongs to the carrier stored on the row rather than to a lumper fee line or
+    a second carrier further down the list.
+    """
+    for co in _carrier_orders_excluding_lumper(details):
+        carrier = co.get("carrier") or {}
+        if carrier.get("name"):
+            return (carrier.get("owner") or {}).get("name")
+    return None
+
+
 def _sum_line_items(line_items: List[dict], code_match: str) -> float:
     total = 0.0
     for li in line_items:

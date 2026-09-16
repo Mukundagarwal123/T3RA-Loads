@@ -4,6 +4,7 @@ from typing import Any, Dict
 from turvo_db.extractors import (
     compute_carrier_freight_cost,
     compute_customer_freight_cost,
+    extract_carrier_am,
     extract_carrier_id,
     extract_carrier_name,
     extract_customer_name,
@@ -57,6 +58,7 @@ def build_record(shipment: Dict[str, Any]) -> Dict[str, Any]:
         # Matching on carrier_name alone breaks on "ABC Trucking LLC" versus
         # "ABC Trucking, LLC", and every per-carrier report depends on the join.
         "carrier_id": extract_carrier_id(details),
+        "carrier_am": extract_carrier_am(details),
         "customer_freight_cost": compute_customer_freight_cost(details),
         "carrier_freight_cost": compute_carrier_freight_cost(details),
         "customer_total_cost": customer_total_cost,
