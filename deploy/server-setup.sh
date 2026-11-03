@@ -41,9 +41,11 @@ echo "== 5. Applying migrations =="
 echo "== 6. Installing systemd units =="
 sudo cp deploy/t3ra-webhook.service deploy/t3ra-worker.service /etc/systemd/system/
 sudo cp deploy/t3ra-maintenance.service deploy/t3ra-maintenance.timer /etc/systemd/system/
+sudo cp deploy/t3ra-healthcheck.service deploy/t3ra-healthcheck.timer /etc/systemd/system/
 sudo systemctl daemon-reload
 sudo systemctl enable t3ra-webhook t3ra-worker
 sudo systemctl enable --now t3ra-maintenance.timer
+sudo systemctl enable --now t3ra-healthcheck.timer
 
 echo "== 7. Allowing the deploy user to restart the services without a password =="
 # GitHub Actions runs non-interactively, so a sudo password prompt would hang

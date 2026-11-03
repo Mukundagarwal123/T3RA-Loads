@@ -1,0 +1,11 @@
+# Watchdog: alerts to Teams when the pipeline stops working.
+# Install: sudo cp deploy/t3ra-healthcheck.* /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now t3ra-healthcheck.timer
+[Unit]
+Description=T3RA health watchdog
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python -m turvo_db.healthcheck

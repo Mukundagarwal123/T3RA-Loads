@@ -13,6 +13,12 @@ SERVICES = ["t3ra-webhook", "t3ra-worker"]
 HEALTH_URL = "http://localhost:8000/health"
 QUEUE_BACKLOG_MINUTES = 15
 REALERT_MINUTES = 30
+#: Alert when nothing has been processed for this long *while work is waiting*.
+#: Guarded on waiting work so a genuinely quiet night cannot raise an alarm.
+#: The 25 Oct outage looked exactly like this: the worker was up and the
+#: /health endpoint was green, but every login was rejected, so the queue grew
+#: for nine days without a single success.
+LAST_SUCCESS_MINUTES = 60
 
 
 def check_services() -> list:
@@ -34,8 +40,12 @@ def check_health_endpoint() -> bool:
         return False
 
 
-def check_queue_backlog():
-    """Returns count of stuck events, or None if the DB couldn't be reached."""
+def check_queue():
+    """Queue health in one round trip, or None if the DB couldn't be reached.
+
+    Returns {"backlog": int, "waiting": int, "idle_minutes": float|None}, where
+    idle_minutes counts from the newest successfully processed event.
+    """
     try:
         conn = psycopg2.connect(
             host=config.DB_HOST, port=config.DB_PORT, database=config.DB_NAME,
@@ -44,19 +54,39 @@ def check_queue_backlog():
         cur = conn.cursor()
         cur.execute(
             """
-            SELECT count(*) FROM public.webhook_queue
-            WHERE state IN ('pending', 'retry')
-              AND received_at < NOW() - INTERVAL '%s minutes';
-            """ % QUEUE_BACKLOG_MINUTES
+            SELECT
+                count(*) FILTER (
+                    WHERE state IN ('pending', 'retry')
+                      AND received_at < NOW() - make_interval(mins => %s)
+                ),
+                count(*) FILTER (WHERE state IN ('pending', 'retry')),
+                EXTRACT(EPOCH FROM (
+                    NOW() - max(processed_at) FILTER (WHERE state = 'done')
+                )) / 60.0
+            FROM public.webhook_queue;
+            """,
+            (QUEUE_BACKLOG_MINUTES,),
         )
-        count = cur.fetchone()[0]
+        backlog, waiting, idle_minutes = cur.fetchone()
         conn.close()
-        return count
+        return {
+            "backlog": backlog,
+            "waiting": waiting,
+            "idle_minutes": float(idle_minutes) if idle_minutes is not None else None,
+        }
     except Exception:
         return None
 
 
 def send_teams_alert(text: str) -> None:
+    # Without a webhook URL urllib raises ValueError('unknown url type'), which
+    # would kill the watchdog at the one moment it has something to say. Say it
+    # on stdout instead - the timer's journal is then the record.
+    if not config.TEAMS_WEBHOOK_URL:
+        print("TEAMS_WEBHOOK_URL is not set, alert not delivered:")
+        print(text)
+        return
+
     card = {
         "type": "AdaptiveCard",
         "$schema": "http://adaptivecards.io/schemas/adaptive-card.json",
@@ -92,11 +122,23 @@ def main() -> None:
     if not check_health_endpoint():
         problems.append("Webhook /health endpoint not responding")
 
-    backlog = check_queue_backlog()
-    if backlog is None:
+    queue = check_queue()
+    if queue is None:
         problems.append("Could not query webhook_queue (DB unreachable?)")
-    elif backlog > 0:
-        problems.append(f"{backlog} webhook event(s) stuck pending/retry for over {QUEUE_BACKLOG_MINUTES} min")
+    else:
+        if queue["backlog"] > 0:
+            problems.append(
+                f"{queue['backlog']} webhook event(s) stuck pending/retry for over "
+                f"{QUEUE_BACKLOG_MINUTES} min"
+            )
+
+        idle = queue["idle_minutes"]
+        if queue["waiting"] > 0 and (idle is None or idle > LAST_SUCCESS_MINUTES):
+            last_seen = "never" if idle is None else f"{idle / 60:.1f}h ago"
+            problems.append(
+                f"Worker has processed nothing since {last_seen} "
+                f"while {queue['waiting']} event(s) wait - check Turvo auth in .env"
+            )
 
     state = load_state()
     now = datetime.now(timezone.utc)

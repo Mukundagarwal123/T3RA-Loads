@@ -33,7 +33,7 @@ src/turvo_db/          the service
   kma.py               postal code -> DAT market area
   db.py                schema, migrations, every query
   config.py            environment
-  healthcheck.py       watchdog, alerts to Teams
+  healthcheck.py       watchdog, alerts to Teams (t3ra-healthcheck.timer, every 10 min)
 
 scripts/               run by hand or from deploy.sh
   migrate.py           apply schema changes (idempotent)
