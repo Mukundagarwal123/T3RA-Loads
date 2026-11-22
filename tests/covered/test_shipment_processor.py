@@ -60,6 +60,12 @@ class TestBuildFinalRecord:
         assert record["carrier"] == "SWIFT TRANSPORT LLC"
         assert record["carrier_am"] == "Jordan Lee"
 
+    def test_carrier_id_is_filled_when_covered(self, shipment_payload, fake_rates):
+        shipment_payload["details"]["carrierOrder"][0]["carrier"]["id"] = 848297
+        record = sp.build_final_record(shipment_payload, "Covered", force_skip_rates=True)
+        assert record["carrier_id"] == 848297
+        assert record["carrier_id_source"] == "turvo"
+
     def test_line_haul_leaves_layover_out(self, shipment_payload, fake_rates):
         record = sp.build_final_record(shipment_payload, "Covered", force_skip_rates=True)
         assert record["carrier_freight_cost"] == 1600.0  # freight-flat only, no 100 layover

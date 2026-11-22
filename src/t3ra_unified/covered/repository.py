@@ -66,7 +66,7 @@ def _normalize_covered_date(record: dict[str, Any]) -> None:
 
 #: Columns a caller may legitimately omit. Every write statement names them,
 #: so a missing key would be a psycopg KeyError rather than a NULL.
-_OPTIONAL_COLUMNS = ("equipment_raw", "carrier_notes")
+_OPTIONAL_COLUMNS = ("equipment_raw", "carrier_notes", "carrier_id", "carrier_id_source")
 
 
 def _apply_optional_defaults(record: dict[str, Any]) -> None:
@@ -124,7 +124,7 @@ def upsert_final_record(record: dict[str, Any]) -> None:
     INSERT INTO {table} (
         shipment_num, shipment_id, lane, lane_raw, pickup_date, delivery_date,
         covered_equipment, equipment_raw,
-        transport_mode, customer_name, carrier_name, carrier_am, carrier_notes, status,
+        transport_mode, customer_name, carrier_name, carrier_am, carrier_id, carrier_id_source, carrier_notes, status,
         customer_freight_cost, customer_total_cost,
         carrier_freight_cost, carrier_total_cost,
         gs_rate, gs_confidence_score, dat_rate,
@@ -134,7 +134,7 @@ def upsert_final_record(record: dict[str, Any]) -> None:
     VALUES (
         %(shipment_num)s, %(shipment_id)s, %(lane)s, %(lane_raw)s, %(pickup_date)s, %(delivery_date)s,
         %(equipment)s, %(equipment_raw)s,
-        %(transport_mode)s, %(customer)s, %(carrier)s, %(carrier_am)s, %(carrier_notes)s, %(status)s,
+        %(transport_mode)s, %(customer)s, %(carrier)s, %(carrier_am)s, %(carrier_id)s, %(carrier_id_source)s, %(carrier_notes)s, %(status)s,
         %(customer_freight_cost)s, %(customer_total_cost)s,
         %(carrier_freight_cost)s, %(carrier_total_cost)s,
         %(GS_rate)s, %(GS_confidence_score)s, %(dat_rate)s,
@@ -155,6 +155,8 @@ def upsert_final_record(record: dict[str, Any]) -> None:
         customer_name = COALESCE(EXCLUDED.customer_name, {table}.customer_name),
         carrier_name = COALESCE(EXCLUDED.carrier_name, {table}.carrier_name),
         carrier_am = COALESCE(EXCLUDED.carrier_am, {table}.carrier_am),
+        carrier_id = COALESCE(EXCLUDED.carrier_id, {table}.carrier_id),
+        carrier_id_source = COALESCE(EXCLUDED.carrier_id_source, {table}.carrier_id_source),
         carrier_notes = COALESCE(EXCLUDED.carrier_notes, {table}.carrier_notes),
         carrier_notes_updated_at = {notes_stamp},
         status = COALESCE(EXCLUDED.status, {table}.status),
@@ -204,6 +206,8 @@ _OVERWRITE_COLUMNS: tuple[tuple[str, str], ...] = (
     ("customer_name", "customer"),
     ("carrier_name", "carrier"),
     ("carrier_am", "carrier_am"),
+    ("carrier_id", "carrier_id"),
+    ("carrier_id_source", "carrier_id_source"),
     ("carrier_notes", "carrier_notes"),
     ("status", "status"),
     ("customer_freight_cost", "customer_freight_cost"),
@@ -409,6 +413,8 @@ def batch_update_preserving_rates(records: list[dict[str, Any]], page_size: int 
         customer_name = COALESCE(%(customer)s, customer_name),
         carrier_name = COALESCE(%(carrier)s, carrier_name),
         carrier_am = COALESCE(%(carrier_am)s, carrier_am),
+        carrier_id = COALESCE(%(carrier_id)s, carrier_id),
+        carrier_id_source = COALESCE(%(carrier_id_source)s, carrier_id_source),
         carrier_notes = COALESCE(%(carrier_notes)s, carrier_notes),
         carrier_notes_updated_at = {notes_stamp},
         status = COALESCE(%(status)s, status),

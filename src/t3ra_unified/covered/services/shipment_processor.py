@@ -23,6 +23,7 @@ from t3ra_unified.completion.extractors import (
     compute_carrier_freight_cost,
     compute_customer_freight_cost,
     extract_carrier_am,
+    extract_carrier_id,
     extract_carrier_name,
     extract_totals,
     parse_date,
@@ -122,6 +123,7 @@ def build_final_record(
     # Shared columns follow the T3RA rule, so both lifecycle phases store the same value.
     carrier_name = extract_carrier_name(details)
     carrier_am = extract_carrier_am(details)
+    carrier_id = extract_carrier_id(details)
 
 
     # The two costs the dashboard shows per side. "Cost" is the line haul --
@@ -212,6 +214,8 @@ def build_final_record(
         "customer": customer_name,
         "carrier": carrier_name,
         "carrier_am": carrier_am,
+        "carrier_id": carrier_id,
+        "carrier_id_source": "turvo" if carrier_id is not None else None,
         "carrier_notes": extract_carrier_notes(carrier_orders),
         "status": status_value,
         "customer_freight_cost": customer_cost,

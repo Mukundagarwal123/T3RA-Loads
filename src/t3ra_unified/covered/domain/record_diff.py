@@ -30,6 +30,7 @@ MATERIAL_FIELDS: tuple[str, ...] = (
     "customer",
     "carrier",
     "carrier_am",
+    "carrier_id",
     "carrier_notes",
     "status",
     "customer_freight_cost",

@@ -23,6 +23,7 @@ from t3ra_unified.completion.extractors import (
     compute_carrier_freight_cost,
     compute_customer_freight_cost,
     extract_carrier_am,
+    extract_carrier_id,
     extract_carrier_name,
     extract_totals,
     parse_date,
@@ -79,6 +80,7 @@ def build_record_without_rates(
 
     carrier_name = extract_carrier_name(details)
     carrier_am = extract_carrier_am(details)
+    carrier_id = extract_carrier_id(details)
 
     lh_margin, gs_margin, dat_margin, t_margin = compute_margins(
         customer_cost,
@@ -105,6 +107,8 @@ def build_record_without_rates(
         "customer": extract_customer_name(customer_orders),
         "carrier": carrier_name,
         "carrier_am": carrier_am,
+        "carrier_id": carrier_id,
+        "carrier_id_source": "turvo" if carrier_id is not None else None,
         "carrier_notes": extract_carrier_notes(carrier_orders),
         "status": normalize_status(details.get("status")),
         "customer_freight_cost": customer_cost,
