@@ -1,0 +1,16 @@
+# Install: sudo cp deploy/t3ra-worker.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl restart t3ra-worker
+[Unit]
+Description=T3RA unified queue worker
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python -m t3ra_unified.worker
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

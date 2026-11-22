@@ -1,0 +1,10 @@
+[Unit]
+Description=Run the covered-loads refresh every 30 minutes
+
+[Timer]
+OnBootSec=8min
+OnUnitActiveSec=30min
+Unit=t3ra-refresh.service
+
+[Install]
+WantedBy=timers.target

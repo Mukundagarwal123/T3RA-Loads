@@ -1,0 +1,16 @@
+# Install: sudo cp deploy/t3ra-api.service /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl restart t3ra-api
+[Unit]
+Description=T3RA unified API (Turvo webhook receiver + dashboard feed)
+After=network.target
+
+[Service]
+Type=simple
+User=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python -m t3ra_unified.api
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
