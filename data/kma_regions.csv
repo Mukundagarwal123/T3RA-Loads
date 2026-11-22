@@ -1,0 +1,925 @@
+region_name,prefix
+New England,010
+New England,011
+New England,012
+New England,013
+New England,014
+New England,015
+New England,016
+New England,017
+New England,018
+New England,019
+New England,020
+New England,021
+New England,022
+New England,023
+New England,024
+New England,025
+New England,026
+New England,027
+New England,028
+New England,029
+New England,030
+New England,031
+New England,032
+New England,033
+New England,034
+New England,035
+New England,036
+New England,037
+New England,038
+New England,039
+New England,040
+New England,041
+New England,042
+New England,043
+New England,044
+New England,045
+New England,046
+New England,047
+New England,048
+New England,049
+New England,050
+New England,051
+New England,055
+New England,056
+New England,057
+New England,058
+New England,059
+New England,060
+New England,061
+New England,062
+New England,063
+New England,064
+New England,065
+New England,066
+New England,067
+New England,068
+New England,069
+Upper Atlantic,005
+Upper Atlantic,052
+Upper Atlantic,053
+Upper Atlantic,054
+Upper Atlantic,070
+Upper Atlantic,071
+Upper Atlantic,072
+Upper Atlantic,073
+Upper Atlantic,074
+Upper Atlantic,075
+Upper Atlantic,076
+Upper Atlantic,077
+Upper Atlantic,078
+Upper Atlantic,079
+Upper Atlantic,080
+Upper Atlantic,081
+Upper Atlantic,082
+Upper Atlantic,083
+Upper Atlantic,084
+Upper Atlantic,085
+Upper Atlantic,086
+Upper Atlantic,087
+Upper Atlantic,088
+Upper Atlantic,089
+Upper Atlantic,100
+Upper Atlantic,101
+Upper Atlantic,102
+Upper Atlantic,103
+Upper Atlantic,104
+Upper Atlantic,105
+Upper Atlantic,106
+Upper Atlantic,107
+Upper Atlantic,108
+Upper Atlantic,109
+Upper Atlantic,110
+Upper Atlantic,111
+Upper Atlantic,112
+Upper Atlantic,113
+Upper Atlantic,114
+Upper Atlantic,115
+Upper Atlantic,116
+Upper Atlantic,117
+Upper Atlantic,118
+Upper Atlantic,119
+Upper Atlantic,120
+Upper Atlantic,121
+Upper Atlantic,122
+Upper Atlantic,123
+Upper Atlantic,124
+Upper Atlantic,125
+Upper Atlantic,126
+Upper Atlantic,127
+Upper Atlantic,128
+Upper Atlantic,129
+Upper Atlantic,130
+Upper Atlantic,131
+Upper Atlantic,132
+Upper Atlantic,133
+Upper Atlantic,134
+Upper Atlantic,135
+Upper Atlantic,136
+Upper Atlantic,137
+Upper Atlantic,138
+Upper Atlantic,139
+Upper Atlantic,140
+Upper Atlantic,141
+Upper Atlantic,142
+Upper Atlantic,143
+Upper Atlantic,144
+Upper Atlantic,145
+Upper Atlantic,146
+Upper Atlantic,147
+Upper Atlantic,148
+Upper Atlantic,149
+Upper Atlantic,150
+Upper Atlantic,151
+Upper Atlantic,152
+Upper Atlantic,153
+Upper Atlantic,154
+Upper Atlantic,155
+Upper Atlantic,156
+Upper Atlantic,157
+Upper Atlantic,158
+Upper Atlantic,159
+Upper Atlantic,160
+Upper Atlantic,161
+Upper Atlantic,162
+Upper Atlantic,163
+Upper Atlantic,164
+Upper Atlantic,165
+Upper Atlantic,166
+Upper Atlantic,167
+Upper Atlantic,168
+Upper Atlantic,169
+Upper Atlantic,170
+Upper Atlantic,171
+Upper Atlantic,172
+Upper Atlantic,173
+Upper Atlantic,174
+Upper Atlantic,175
+Upper Atlantic,176
+Upper Atlantic,177
+Upper Atlantic,178
+Upper Atlantic,179
+Upper Atlantic,180
+Upper Atlantic,181
+Upper Atlantic,182
+Upper Atlantic,183
+Upper Atlantic,184
+Upper Atlantic,185
+Upper Atlantic,186
+Upper Atlantic,187
+Upper Atlantic,188
+Upper Atlantic,189
+Upper Atlantic,190
+Upper Atlantic,191
+Upper Atlantic,192
+Upper Atlantic,193
+Upper Atlantic,194
+Upper Atlantic,195
+Upper Atlantic,196
+Lower Atlantic,197
+Lower Atlantic,198
+Lower Atlantic,199
+Lower Atlantic,200
+Lower Atlantic,201
+Lower Atlantic,202
+Lower Atlantic,203
+Lower Atlantic,204
+Lower Atlantic,205
+Lower Atlantic,206
+Lower Atlantic,207
+Lower Atlantic,208
+Lower Atlantic,209
+Lower Atlantic,210
+Lower Atlantic,211
+Lower Atlantic,212
+Lower Atlantic,214
+Lower Atlantic,215
+Lower Atlantic,216
+Lower Atlantic,217
+Lower Atlantic,218
+Lower Atlantic,219
+Lower Atlantic,220
+Lower Atlantic,221
+Lower Atlantic,222
+Lower Atlantic,223
+Lower Atlantic,224
+Lower Atlantic,225
+Lower Atlantic,226
+Lower Atlantic,227
+Lower Atlantic,228
+Lower Atlantic,229
+Lower Atlantic,230
+Lower Atlantic,231
+Lower Atlantic,232
+Lower Atlantic,233
+Lower Atlantic,234
+Lower Atlantic,235
+Lower Atlantic,236
+Lower Atlantic,237
+Lower Atlantic,238
+Lower Atlantic,239
+Lower Atlantic,240
+Lower Atlantic,241
+Lower Atlantic,242
+Lower Atlantic,243
+Lower Atlantic,244
+Lower Atlantic,245
+Lower Atlantic,246
+Lower Atlantic,247
+Lower Atlantic,248
+Lower Atlantic,249
+Lower Atlantic,250
+Lower Atlantic,251
+Lower Atlantic,252
+Lower Atlantic,253
+Lower Atlantic,254
+Lower Atlantic,255
+Lower Atlantic,256
+Lower Atlantic,257
+Lower Atlantic,258
+Lower Atlantic,259
+Lower Atlantic,260
+Lower Atlantic,261
+Lower Atlantic,262
+Lower Atlantic,263
+Lower Atlantic,264
+Lower Atlantic,265
+Lower Atlantic,266
+Lower Atlantic,267
+Lower Atlantic,268
+Lower Atlantic,569
+Carolinas,270
+Carolinas,271
+Carolinas,272
+Carolinas,273
+Carolinas,274
+Carolinas,275
+Carolinas,276
+Carolinas,277
+Carolinas,278
+Carolinas,279
+Carolinas,280
+Carolinas,281
+Carolinas,282
+Carolinas,283
+Carolinas,284
+Carolinas,285
+Carolinas,286
+Carolinas,287
+Carolinas,288
+Carolinas,289
+Carolinas,290
+Carolinas,291
+Carolinas,292
+Carolinas,293
+Carolinas,294
+Carolinas,295
+Carolinas,296
+Carolinas,297
+Carolinas,298
+Carolinas,299
+Florida-So Georgia,313
+Florida-So Georgia,314
+Florida-So Georgia,315
+Florida-So Georgia,316
+Florida-So Georgia,317
+Florida-So Georgia,318
+Florida-So Georgia,319
+Florida-So Georgia,320
+Florida-So Georgia,321
+Florida-So Georgia,322
+Florida-So Georgia,323
+Florida-So Georgia,324
+Florida-So Georgia,325
+Florida-So Georgia,326
+Florida-So Georgia,327
+Florida-So Georgia,328
+Florida-So Georgia,329
+Florida-So Georgia,330
+Florida-So Georgia,331
+Florida-So Georgia,332
+Florida-So Georgia,333
+Florida-So Georgia,334
+Florida-So Georgia,335
+Florida-So Georgia,336
+Florida-So Georgia,337
+Florida-So Georgia,338
+Florida-So Georgia,339
+Florida-So Georgia,341
+Florida-So Georgia,342
+Florida-So Georgia,344
+Florida-So Georgia,346
+Florida-So Georgia,347
+Florida-So Georgia,349
+Florida-So Georgia,398
+Southeast,300
+Southeast,301
+Southeast,302
+Southeast,303
+Southeast,304
+Southeast,305
+Southeast,306
+Southeast,307
+Southeast,308
+Southeast,309
+Southeast,310
+Southeast,311
+Southeast,312
+Southeast,350
+Southeast,351
+Southeast,352
+Southeast,354
+Southeast,355
+Southeast,356
+Southeast,357
+Southeast,358
+Southeast,359
+Southeast,360
+Southeast,361
+Southeast,362
+Southeast,363
+Southeast,364
+Southeast,365
+Southeast,366
+Southeast,367
+Southeast,368
+Southeast,369
+Southeast,370
+Southeast,371
+Southeast,372
+Southeast,373
+Southeast,374
+Southeast,375
+Southeast,376
+Southeast,377
+Southeast,378
+Southeast,379
+Southeast,380
+Southeast,381
+Southeast,382
+Southeast,383
+Southeast,384
+Southeast,385
+Southeast,386
+Southeast,387
+Southeast,388
+Southeast,389
+Southeast,390
+Southeast,391
+Southeast,392
+Southeast,393
+Southeast,394
+Southeast,395
+Southeast,396
+Southeast,397
+Southeast,399
+Ohio River,400
+Ohio River,401
+Ohio River,402
+Ohio River,403
+Ohio River,404
+Ohio River,405
+Ohio River,406
+Ohio River,407
+Ohio River,408
+Ohio River,409
+Ohio River,410
+Ohio River,411
+Ohio River,412
+Ohio River,413
+Ohio River,414
+Ohio River,415
+Ohio River,416
+Ohio River,417
+Ohio River,418
+Ohio River,419
+Ohio River,420
+Ohio River,421
+Ohio River,422
+Ohio River,423
+Ohio River,424
+Ohio River,425
+Ohio River,426
+Ohio River,427
+Ohio River,430
+Ohio River,431
+Ohio River,432
+Ohio River,437
+Ohio River,438
+Ohio River,439
+Ohio River,450
+Ohio River,451
+Ohio River,452
+Ohio River,453
+Ohio River,454
+Ohio River,455
+Ohio River,456
+Ohio River,457
+Ohio River,459
+Ohio River,470
+Ohio River,471
+Ohio River,472
+Ohio River,473
+Ohio River,474
+Ohio River,475
+Ohio River,476
+Ohio River,477
+Ohio River,478
+Ohio River,619
+Ohio River,620
+Ohio River,622
+Ohio River,623
+Ohio River,624
+Ohio River,625
+Ohio River,626
+Ohio River,627
+Ohio River,628
+Ohio River,629
+Great Lakes,433
+Great Lakes,434
+Great Lakes,435
+Great Lakes,436
+Great Lakes,440
+Great Lakes,441
+Great Lakes,442
+Great Lakes,443
+Great Lakes,444
+Great Lakes,445
+Great Lakes,446
+Great Lakes,447
+Great Lakes,448
+Great Lakes,449
+Great Lakes,458
+Great Lakes,460
+Great Lakes,461
+Great Lakes,462
+Great Lakes,463
+Great Lakes,464
+Great Lakes,465
+Great Lakes,466
+Great Lakes,467
+Great Lakes,468
+Great Lakes,469
+Great Lakes,479
+Great Lakes,480
+Great Lakes,481
+Great Lakes,482
+Great Lakes,483
+Great Lakes,484
+Great Lakes,485
+Great Lakes,486
+Great Lakes,487
+Great Lakes,488
+Great Lakes,489
+Great Lakes,490
+Great Lakes,491
+Great Lakes,492
+Great Lakes,493
+Great Lakes,494
+Great Lakes,495
+Great Lakes,496
+Great Lakes,497
+Great Lakes,498
+Great Lakes,499
+Great Lakes,530
+Great Lakes,531
+Great Lakes,532
+Great Lakes,534
+Great Lakes,535
+Great Lakes,537
+Great Lakes,538
+Great Lakes,539
+Great Lakes,540
+Great Lakes,541
+Great Lakes,542
+Great Lakes,543
+Great Lakes,544
+Great Lakes,545
+Great Lakes,546
+Great Lakes,547
+Great Lakes,548
+Great Lakes,549
+Great Lakes,600
+Great Lakes,601
+Great Lakes,602
+Great Lakes,603
+Great Lakes,604
+Great Lakes,605
+Great Lakes,606
+Great Lakes,607
+Great Lakes,608
+Great Lakes,609
+Great Lakes,610
+Great Lakes,611
+Great Lakes,612
+Great Lakes,613
+Great Lakes,614
+Great Lakes,615
+Great Lakes,616
+Great Lakes,617
+Great Lakes,618
+Upper Midwest,500
+Upper Midwest,501
+Upper Midwest,502
+Upper Midwest,503
+Upper Midwest,504
+Upper Midwest,505
+Upper Midwest,506
+Upper Midwest,507
+Upper Midwest,508
+Upper Midwest,509
+Upper Midwest,510
+Upper Midwest,511
+Upper Midwest,512
+Upper Midwest,513
+Upper Midwest,514
+Upper Midwest,515
+Upper Midwest,516
+Upper Midwest,520
+Upper Midwest,521
+Upper Midwest,522
+Upper Midwest,523
+Upper Midwest,524
+Upper Midwest,525
+Upper Midwest,526
+Upper Midwest,527
+Upper Midwest,528
+Upper Midwest,550
+Upper Midwest,551
+Upper Midwest,553
+Upper Midwest,554
+Upper Midwest,555
+Upper Midwest,556
+Upper Midwest,557
+Upper Midwest,558
+Upper Midwest,559
+Upper Midwest,560
+Upper Midwest,561
+Upper Midwest,562
+Upper Midwest,563
+Upper Midwest,564
+Upper Midwest,565
+Upper Midwest,566
+Upper Midwest,567
+Upper Midwest,570
+Upper Midwest,571
+Upper Midwest,572
+Upper Midwest,573
+Upper Midwest,574
+Upper Midwest,575
+Upper Midwest,576
+Upper Midwest,577
+Upper Midwest,580
+Upper Midwest,581
+Upper Midwest,582
+Upper Midwest,583
+Upper Midwest,584
+Upper Midwest,585
+Upper Midwest,586
+Upper Midwest,587
+Upper Midwest,588
+Lower Midwest,630
+Lower Midwest,631
+Lower Midwest,633
+Lower Midwest,634
+Lower Midwest,635
+Lower Midwest,636
+Lower Midwest,637
+Lower Midwest,638
+Lower Midwest,639
+Lower Midwest,640
+Lower Midwest,641
+Lower Midwest,644
+Lower Midwest,645
+Lower Midwest,646
+Lower Midwest,647
+Lower Midwest,648
+Lower Midwest,649
+Lower Midwest,650
+Lower Midwest,651
+Lower Midwest,652
+Lower Midwest,653
+Lower Midwest,654
+Lower Midwest,655
+Lower Midwest,656
+Lower Midwest,657
+Lower Midwest,658
+Lower Midwest,660
+Lower Midwest,661
+Lower Midwest,662
+Lower Midwest,664
+Lower Midwest,665
+Lower Midwest,666
+Lower Midwest,667
+Lower Midwest,668
+Lower Midwest,669
+Lower Midwest,670
+Lower Midwest,671
+Lower Midwest,672
+Lower Midwest,673
+Lower Midwest,674
+Lower Midwest,675
+Lower Midwest,676
+Lower Midwest,677
+Lower Midwest,678
+Lower Midwest,679
+Lower Midwest,680
+Lower Midwest,681
+Lower Midwest,683
+Lower Midwest,684
+Lower Midwest,685
+Lower Midwest,686
+Lower Midwest,687
+Lower Midwest,688
+Lower Midwest,689
+Lower Midwest,690
+Lower Midwest,691
+Lower Midwest,692
+Lower Midwest,693
+South Central,700
+South Central,701
+South Central,703
+South Central,704
+South Central,705
+South Central,706
+South Central,707
+South Central,708
+South Central,710
+South Central,711
+South Central,712
+South Central,713
+South Central,714
+South Central,716
+South Central,717
+South Central,718
+South Central,719
+South Central,720
+South Central,721
+South Central,722
+South Central,723
+South Central,724
+South Central,725
+South Central,726
+South Central,727
+South Central,728
+South Central,729
+South Central,730
+South Central,731
+South Central,733
+South Central,734
+South Central,735
+South Central,736
+South Central,737
+South Central,738
+South Central,739
+South Central,740
+South Central,741
+South Central,743
+South Central,744
+South Central,745
+South Central,746
+South Central,747
+South Central,748
+South Central,749
+South Central,750
+South Central,751
+South Central,752
+South Central,753
+South Central,754
+South Central,755
+South Central,756
+South Central,757
+South Central,758
+South Central,759
+South Central,760
+South Central,761
+South Central,762
+South Central,763
+South Central,764
+South Central,765
+South Central,766
+South Central,767
+South Central,768
+South Central,769
+South Central,770
+South Central,771
+South Central,772
+South Central,773
+South Central,774
+South Central,775
+South Central,776
+South Central,777
+South Central,778
+South Central,779
+South Central,780
+South Central,781
+South Central,782
+South Central,783
+South Central,784
+South Central,785
+South Central,786
+South Central,787
+South Central,788
+South Central,789
+South Central,790
+South Central,791
+South Central,792
+South Central,793
+South Central,794
+South Central,795
+South Central,796
+South Central,797
+South Central,798
+South Central,799
+South Central,885
+Lower Mountain,800
+Lower Mountain,801
+Lower Mountain,802
+Lower Mountain,803
+Lower Mountain,804
+Lower Mountain,805
+Lower Mountain,806
+Lower Mountain,807
+Lower Mountain,808
+Lower Mountain,809
+Lower Mountain,810
+Lower Mountain,811
+Lower Mountain,812
+Lower Mountain,813
+Lower Mountain,814
+Lower Mountain,815
+Lower Mountain,816
+Lower Mountain,840
+Lower Mountain,841
+Lower Mountain,842
+Lower Mountain,843
+Lower Mountain,844
+Lower Mountain,845
+Lower Mountain,846
+Lower Mountain,847
+Lower Mountain,850
+Lower Mountain,851
+Lower Mountain,852
+Lower Mountain,853
+Lower Mountain,855
+Lower Mountain,856
+Lower Mountain,857
+Lower Mountain,859
+Lower Mountain,860
+Lower Mountain,863
+Lower Mountain,864
+Lower Mountain,865
+Lower Mountain,870
+Lower Mountain,871
+Lower Mountain,872
+Lower Mountain,873
+Lower Mountain,874
+Lower Mountain,875
+Lower Mountain,877
+Lower Mountain,878
+Lower Mountain,879
+Lower Mountain,880
+Lower Mountain,881
+Lower Mountain,882
+Lower Mountain,883
+Lower Mountain,884
+Upper Mountain,590
+Upper Mountain,591
+Upper Mountain,592
+Upper Mountain,593
+Upper Mountain,594
+Upper Mountain,595
+Upper Mountain,596
+Upper Mountain,597
+Upper Mountain,598
+Upper Mountain,599
+Upper Mountain,820
+Upper Mountain,821
+Upper Mountain,822
+Upper Mountain,823
+Upper Mountain,824
+Upper Mountain,825
+Upper Mountain,826
+Upper Mountain,827
+Upper Mountain,828
+Upper Mountain,829
+Upper Mountain,830
+Upper Mountain,831
+Upper Mountain,832
+Upper Mountain,833
+Upper Mountain,834
+Upper Mountain,835
+Upper Mountain,836
+Upper Mountain,837
+Upper Mountain,838
+Upper Mountain,889
+Upper Mountain,890
+Upper Mountain,891
+Upper Mountain,893
+Upper Mountain,894
+Upper Mountain,895
+Upper Mountain,897
+Upper Mountain,898
+California,900
+California,901
+California,902
+California,903
+California,904
+California,905
+California,906
+California,907
+California,908
+California,910
+California,911
+California,912
+California,913
+California,914
+California,915
+California,916
+California,917
+California,918
+California,919
+California,920
+California,921
+California,922
+California,923
+California,924
+California,925
+California,926
+California,927
+California,928
+California,930
+California,931
+California,932
+California,933
+California,934
+California,935
+California,936
+California,937
+California,938
+California,939
+California,940
+California,941
+California,942
+California,943
+California,944
+California,945
+California,946
+California,947
+California,948
+California,949
+California,950
+California,951
+California,952
+California,953
+California,954
+California,955
+California,956
+California,957
+California,958
+California,959
+California,960
+California,961
+Pacific Northwest,970
+Pacific Northwest,971
+Pacific Northwest,972
+Pacific Northwest,973
+Pacific Northwest,974
+Pacific Northwest,975
+Pacific Northwest,976
+Pacific Northwest,977
+Pacific Northwest,978
+Pacific Northwest,979
+Pacific Northwest,980
+Pacific Northwest,981
+Pacific Northwest,982
+Pacific Northwest,983
+Pacific Northwest,984
+Pacific Northwest,985
+Pacific Northwest,986
+Pacific Northwest,988
+Pacific Northwest,989
+Pacific Northwest,990
+Pacific Northwest,991
+Pacific Northwest,992
+Pacific Northwest,993
+Pacific Northwest,994
+Canada East,A
+Canada East,B
+Canada East,C
+Canada East,E
+Canada Central,G
+Canada Central,H
+Canada Central,J
+Canada Central,K
+Canada Central,L
+Canada Central,M
+Canada Central,N
+Canada Central,P
+Canada West,R
+Canada West,S
+Canada West,T
+Canada West,V
+Canada West,X
+Canada West,Y

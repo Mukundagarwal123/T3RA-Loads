@@ -1,0 +1,46 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "t3ra-unified"
+version = "0.1.0"
+description = "One service for the whole life of a Turvo shipment: Covered Loads while open, T3RA route-complete ingestion once done. One webhook, one queue, one database."
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.8",
+    "uvicorn[standard]>=0.30.6",
+    "requests>=2.32.3",
+    "pydantic>=2.10.6",
+    "pydantic-settings>=2.7.1",
+    "python-dotenv>=1.0.1",
+    "psycopg2-binary>=2.9.11",
+    "alembic>=1.14.1",
+    "sqlalchemy>=2.0.37",
+    "typing-extensions>=4.12.2",
+    "logfire[fastapi]>=3.5.3",
+    "tenacity>=9.0.0",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.3", "responses>=0.25", "httpx>=0.28", "ruff>=0.9"]
+
+[project.scripts]
+t3ra-api = "t3ra_unified.api.__main__:main"
+t3ra-worker = "t3ra_unified.worker:main"
+t3ra-refresh = "t3ra_unified.covered.services.refresh_job:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q --strict-markers"
+markers = ["integration: needs the local Postgres from docker-compose (DB_* in .env)"]
+
+[tool.logfire]
+ignore_no_config = true
