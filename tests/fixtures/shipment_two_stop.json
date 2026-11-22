@@ -1,0 +1,172 @@
+{
+  "details": {
+    "id": 115792084,
+    "customId": "T3-100045",
+    "ltlShipment": false,
+    "status": {
+      "code": {
+        "value": "Covered"
+      }
+    },
+    "transportation": {
+      "mode": {
+        "value": "TL"
+      }
+    },
+    "startDate": {
+      "date": "2025-04-08T00:00:00Z"
+    },
+    "endDate": {
+      "date": "2025-04-10T00:00:00Z"
+    },
+    "margin": {
+      "totalPayableAmount": 1800.0,
+      "totalReceivableAmount": 2400.0
+    },
+    "equipment": [
+      {
+        "deleted": false,
+        "type": {
+          "value": "Dry Van"
+        }
+      }
+    ],
+    "globalRoute": [
+      {
+        "sequence": 1,
+        "deleted": false,
+        "address": {
+          "city": "MCCLELLAN",
+          "state": "CA",
+          "zip": "95652"
+        }
+      },
+      {
+        "sequence": 2,
+        "deleted": false,
+        "address": {
+          "city": "LIVERMORE",
+          "state": "CA",
+          "zip": "94550"
+        }
+      },
+      {
+        "sequence": 3,
+        "deleted": true,
+        "address": {
+          "city": "DELETED STOP",
+          "state": "CA",
+          "zip": "90001"
+        }
+      }
+    ],
+    "customerOrder": [
+      {
+        "deleted": false,
+        "customer": {
+          "name": "DIAMOND PET FOODS"
+        },
+        "costs": {
+          "lineItem": [
+            {
+              "deleted": false,
+              "code": {
+                "value": "Freight - Flat"
+              },
+              "amount": 2200.0,
+              "lastUpdatedOn": "2025-04-07T12:00:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Accessorial - Layover"
+              },
+              "amount": 150.0,
+              "lastUpdatedOn": "2025-04-07T12:05:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Accessorial - Detention"
+              },
+              "amount": 125.0,
+              "lastUpdatedOn": "2025-04-07T12:06:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Accessorial - Lumper"
+              },
+              "amount": 50.0
+            }
+          ],
+          "subTotal": 2525.0,
+          "totalTax": 0,
+          "totalAmount": 2525.0
+        }
+      }
+    ],
+    "carrierOrder": [
+      {
+        "deleted": false,
+        "carrier": {
+          "name": "SWIFT TRANSPORT LLC",
+          "owner": {
+            "name": "Jordan Lee"
+          }
+        },
+        "costs": {
+          "lineItem": [
+            {
+              "deleted": false,
+              "code": {
+                "value": "Freight - Flat"
+              },
+              "amount": 1500.0,
+              "lastUpdatedOn": "2025-04-07T09:00:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Freight-Flat"
+              },
+              "amount": 1600.0,
+              "lastUpdatedOn": "2025-04-07T15:30:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Accessorial - Layover"
+              },
+              "amount": 100.0,
+              "lastUpdatedOn": "2025-04-07T15:31:00Z"
+            },
+            {
+              "deleted": false,
+              "code": {
+                "value": "Accessorial - Detention"
+              },
+              "amount": 75.0,
+              "lastUpdatedOn": "2025-04-07T15:32:00Z"
+            }
+          ],
+          "subTotal": 1775.0,
+          "totalTax": 0,
+          "totalAmount": 1775.0
+        }
+      },
+      {
+        "deleted": false,
+        "carrier": {
+          "name": "Lumper Advance"
+        },
+        "costs": {
+          "lineItem": [],
+          "subTotal": 241.9,
+          "totalTax": 0,
+          "totalAmount": 241.9
+        }
+      }
+    ]
+  }
+}

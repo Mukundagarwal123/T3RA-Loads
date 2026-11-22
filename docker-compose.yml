@@ -1,0 +1,17 @@
+name: t3ra-unified
+services:
+  postgres:
+    image: postgres:17
+    container_name: t3ra-unified-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: t3ra_unified
+      POSTGRES_USER: ${POSTGRES_USER:-t3ra}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD in .env}
+    ports:
+      - "127.0.0.1:5441:5432"   # loopback only; 5440 belongs to merged-db
+    volumes:
+      - t3ra_unified_pgdata:/var/lib/postgresql/data
+volumes:
+  t3ra_unified_pgdata:
+    name: t3ra_unified_pgdata

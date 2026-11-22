@@ -1,0 +1,13 @@
+[Unit]
+Description=Run the T3RA health watchdog every 10 minutes
+
+[Timer]
+# A ten minute cadence against a fifteen minute backlog threshold means a
+# stuck pipeline is reported within roughly half an hour of going wrong,
+# rather than whenever somebody happens to look.
+OnBootSec=5min
+OnUnitActiveSec=10min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

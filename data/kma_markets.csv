@@ -1,0 +1,150 @@
+market_id,market_name,ref_city,ref_state,country
+AL_BIR,Birmingham,Birmingham,AL,US
+AL_DEC,Decatur,Decatur,AL,US
+AL_MOB,Mobile,Mobile,AL,US
+AL_MON,Montgomery,Montgomery,AL,US
+AR_FAY,Fayetteville,Fayetteville,AR,US
+AR_LIT,Little Rock,Little Rock,AR,US
+AZ_FLA,Flagstaff,Flagstaff,AZ,US
+AZ_PHO,Phoenix,Phoenix,AZ,US
+AZ_TUC,Tucson,Tucson,AZ,US
+CA_FRS,Fresno,Fresno,CA,US
+CA_LAX,Los Angeles,Los Angeles,CA,US
+CA_ONT,Ontario,Ontario,CA,US
+CA_SDI,San Diego,San Diego,CA,US
+CA_SFR,San Francisco,San Francisco,CA,US
+CA_STK,Stockton,Stockton,CA,US
+CO_DEN,Denver,Denver,CO,US
+CO_GRA,Grand Junction,Grand Jct,CO,US
+CT_HAR,Hartford,Hartford,CT,US
+VA_ALE,Alexandria,Alexandria,VA,US
+NC_GRE,Greensboro,Greensboro,NC,US
+FL_JAX,Jacksonville,Jacksonville,FL,US
+FL_LAK,Lakeland,Lakeland,FL,US
+FL_MIA,Miami,Miami,FL,US
+FL_TAL,Tallahassee,Tallahassee,FL,US
+GA_ATL,Atlanta,Atlanta,GA,US
+GA_MAC,Macon,Macon,GA,US
+GA_SAV,Savannah,Savannah,GA,US
+GA_TIF,Tifton,Tifton,GA,US
+IA_CED,Cedar Rapids,Cedar Rapids,IA,US
+IA_DES,Des Moines,Des Moines,IA,US
+IA_DUB,Dubuque,Dubuque,IA,US
+ID_TWI,Twin Falls,Twin Falls,ID,US
+IL_BLO,Bloomington,Bloomington,IL,US
+IL_CHI,Chicago,Chicago,IL,US
+IL_JOL,Joliet,Joliet,IL,US
+IL_QUI,Quincy,Quincy,IL,US
+IL_RFD,Rockford,Rockford,IL,US
+IL_ROC,Rock Island,Rock Island,IL,US
+IL_TAY,Taylorville,Taylorville,IL,US
+IN_EVA,Evansville,Evansville,IN,US
+IN_FTW,Ft Wayne,Ft Wayne,IN,US
+IN_GRY,Gary,Gary,IN,US
+IN_IND,Indianapolis,Indianapolis,IN,US
+IN_SBD,S Bend,South Bend,IN,US
+IN_TER,Terre Haute,Terre Haute,IN,US
+KS_HUT,Hutchinson,Hutchinson,KS,US
+KY_BOW,Bowling Green,Bowling Green,KY,US
+KY_LEX,Lexington,Lexington,KY,US
+KY_LOU,Louisville,Louisville,KY,US
+LA_NEW,New Orleans,New Orleans,LA,US
+LA_SHR,Shreveport,Shreveport,LA,US
+MA_BOS,Boston,Boston,MA,US
+MA_SPR,Springfield,Springfield,MA,US
+MD_BAL,Baltimore,Baltimore,MD,US
+ME_AUG,Augusta,Augusta,ME,US
+MI_DET,Detroit,Detroit,MI,US
+MI_RAP,Grand Rapids,Grand Rapids,MI,US
+MI_SAG,Saginaw,Saginaw,MI,US
+MN_DUL,Duluth,Duluth,MN,US
+MN_MIN,Minneapolis,Minneapolis,MN,US
+MN_STC,St Cloud,St Cloud,MN,US
+MO_GIR,Cape Girardeau,Cape Girardeau,MO,US
+MO_JEF,Jefferson City,Jefferson City,MO,US
+MO_JOP,Joplin,Joplin,MO,US
+MO_KAN,Kansas City,Kansas City,MO,US
+MO_STL,St Louis,St Louis,MO,US
+MS_JAC,Jackson,Jackson,MS,US
+MT_BIL,Billings,Billings,MT,US
+MT_MIS,Missoula,Missoula,MT,US
+NC_CHA,Charlotte,Charlotte,NC,US
+NC_RAL,Raleigh,Raleigh,NC,US
+NC_WIL,Wilmington,Wilmington,NC,US
+ND_FAR,Fargo,Fargo,ND,US
+ND_BIS,Bismarck,Bismarck,ND,US
+NE_NPL,N Platte,North Platte,NE,US
+NE_OMA,Omaha,Omaha,NE,US
+NH_BRI,Bristol,Bristol,NH,US
+NJ_ELI,Elizabeth,Elizabeth,NJ,US
+NM_ALB,Albuquerque,Albuquerque,NM,US
+NV_VEG,Las Vegas,Las Vegas,NV,US
+NV_REN,Reno,Reno,NV,US
+NY_ALB,Albany,Albany,NY,US
+NY_BRN,Brooklyn,Brooklyn,NY,US
+NY_BUF,Buffalo,Buffalo,NY,US
+NY_ELM,Elmira,Elmira,NY,US
+NY_ROC,Rochester,Rochester,NY,US
+NY_SYR,Syracuse,Syracuse,NY,US
+OH_CIN,Cincinnati,Cincinnati,OH,US
+OH_CLE,Cleveland,Cleveland,OH,US
+OH_COL,Columbus,Columbus,OH,US
+OH_TOL,Toledo,Toledo,OH,US
+OK_OKC,Oklahoma City,Oklahoma City,OK,US
+OK_TUL,Tulsa,Tulsa,OK,US
+OR_MED,Medford,Medford,OR,US
+OR_PEN,Pendleton,Pendleton,OR,US
+OR_POR,Portland,Portland,OR,US
+PA_ALL,Allentown,Allentown,PA,US
+PA_ERI,Erie,Erie,PA,US
+PA_HAR,Harrisburg,Harrisburg,PA,US
+PA_PHI,Philadelphia,Philadelphia,PA,US
+PA_PIT,Pittsburgh,Pittsburgh,PA,US
+SC_CHA,N Charleston,N Charleston,SC,US
+SC_COL,Columbia,Columbia,SC,US
+SC_GRE,Greenville,Greenville,SC,US
+SD_RAP,Rapid City,Rapid City,SD,US
+SD_SXF,Sioux Falls,Sioux Falls,SD,US
+TN_CHA,Chattanooga,Chattanooga,TN,US
+TN_KNO,Knoxville,Knoxville,TN,US
+TN_MEM,Memphis,Memphis,TN,US
+TN_NAS,Nashville,Nashville,TN,US
+TX_AMA,Amarillo,Amarillo,TX,US
+TX_AUS,Austin,Austin,TX,US
+TX_DAL,Dallas,Dallas,TX,US
+TX_ELP,El Paso,El Paso,TX,US
+TX_FTW,Ft Worth,Ft Worth,TX,US
+TX_HOU,Houston,Houston,TX,US
+TX_LAR,Laredo,Laredo,TX,US
+TX_LUB,Lubbock,Lubbock,TX,US
+TX_MCA,McAllen,McAllen,TX,US
+TX_ANT,San Antonio,San Antonio,TX,US
+TX_TEX,Texarkana,Texarkana,TX,US
+UT_SLC,Salt Lake City,Salt Lake City,UT,US
+VA_NOR,Norfolk,Norfolk,VA,US
+VA_RCH,Richmond,Richmond,VA,US
+VA_ROA,Roanoke,Roanoke,VA,US
+VA_WIN,Winchester,Winchester,VA,US
+WA_SEA,Seattle,Seattle,WA,US
+WA_SPO,Spokane,Spokane,WA,US
+WI_EAU,Eau Claire,Eau Claire,WI,US
+WI_GRE,Green Bay,Green Bay,WI,US
+WI_MAD,Madison,Madison,WI,US
+WI_MIL,Milwaukee,Milwaukee,WI,US
+WV_CHA,Charleston,Charleston,WV,US
+WV_HUN,Huntington,Huntington,WV,US
+WY_GRE,Green River,Green River,WY,US
+NF_STJ,St Johns,St Johns,NF,CA
+NS_HAL,Halifax,Halifax,NS,CA
+NB_MON,Moncton,Moncton,NB,CA
+PQ_QUE,Quebec,Quebec,PQ,CA
+PQ_MON,Montreal,Montreal,PQ,CA
+ON_OTT,Ottawa,Ottawa,ON,CA
+ON_TOR,Toronto,Toronto,ON,CA
+ON_LON,London,London,ON,CA
+ON_SUD,Sudbury,Sudbury,ON,CA
+MB_WIN,Winnipeg,Winnipeg,MB,CA
+SK_REG,Regina,Regina,SK,CA
+AB_CAL,Calgary,Calgary,AB,CA
+BC_VAN,Vancouver,Vancouver,BC,CA
+BC_PRI,Prince George,Prince George,BC,CA

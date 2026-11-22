@@ -1,0 +1,11 @@
+# Install: sudo cp deploy/t3ra-refresh.service deploy/t3ra-refresh.timer /etc/systemd/system/
+#          sudo systemctl daemon-reload && sudo systemctl enable --now t3ra-refresh.timer
+[Unit]
+Description=T3RA covered-loads refresh (one pass; scheduled by t3ra-refresh.timer)
+After=network.target
+
+[Service]
+Type=oneshot
+User=ubuntu
+WorkingDirectory=/home/ubuntu/app
+ExecStart=/home/ubuntu/app/.venv/bin/python -m t3ra_unified.covered.services.refresh_job
